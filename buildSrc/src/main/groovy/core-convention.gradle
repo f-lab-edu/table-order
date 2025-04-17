@@ -1,0 +1,12 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.flab'
+version = '0.0.1-SNAPSHOT'
+
+// 라이브러리 저장소
+repositories {
+    // https://repo.maven.apache.org/maven2/ 에서 라이브러리를 다운 받음.
+    mavenCentral()
+}

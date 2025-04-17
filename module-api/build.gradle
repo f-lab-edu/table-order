@@ -1,4 +1,5 @@
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-//    implementation project(':module-database')
+plugins {
+    id 'core-convention'
+    id 'java-convention'
+    id 'spring-convention'
 }
