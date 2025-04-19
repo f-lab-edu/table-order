@@ -1,12 +1,14 @@
-# 고민 사항
-1. 일단 storeId, tableId, apiKey 등의 정보는 테이블 오더 설치 시 서버에서 ID를 받아 파일에 저장했다고 가정.  
+# 고려 사항
+1. 일단 storeId, tableId, apiKey 등의 정보는 테이블 오더 설치 시 서버에서 ID를 받아 파일에 저장했다고 가정.
+    => storeId는 apiKey로 추출하는 방식이 나을지, parameter로 주는게 나을지
+    => 일단 apiKey로 추출하는 방식 채택 (보안이나 효율성이 더 나을 것 같음)
 2. 주문 내역은 API 호출로 가져오는 것이 나을지 Front에서 갖고 있는 것이 나을지  
 3. 선 결제 방식일 땐 테이블의 주문 내역 clear는 어떻게 하는게 나은가? => POS에 테이블을 똑같이 보여주니까 직원이 clear하는 걸로?
 
 # header
 ```
 Content-Type: application/json
-Authorization: Basic {{apiKey}}
+Authorization: Bearer {{apiKey}}
 ```
 # 에러 Reposne
 ```json
@@ -17,17 +19,34 @@ Authorization: Basic {{apiKey}}
 ```
 # 1. Store
 
+## 가게 등록 (회원 가입)
 
 
 # 2. Menu
 
-## 메뉴 조회
-- API : GET /menu/{{storeId}}
-- Request 
+## 언어 변경
+- API : PATCH /menu/table/{{tableId}}/language
+- Request
+    ```json
+    {
+        "language" : "en"
+    }
+    ```
 - Response
     ```json
     {
-        "code" : "01",
+        "code" : 200,
+        "message" : "",
+    }
+    ```
+
+## 메뉴 조회
+- API : GET /menu
+- Request
+- Response
+    ```json
+    {
+        "code" : 200,
         "message" : "",
         "data" : [
             {
@@ -36,24 +55,22 @@ Authorization: Basic {{apiKey}}
                 "menu" : [
                     {
                         "menuId" : 1,
-                        "name" : "치즈 피자",
+                        "menuName" : "치즈 피자",
                         "price" : 8000,
-                        "image" : "https://image.table-order.com/1_1.jpg",
-                        "recommend" : true,
-                        "sale" : false,
-                        "soldOut" : false,
-                        "option" : true,
+                        "image" : "https://image.table-order.com/1_1.jpg",                        
+                        "isSoldOut" : false,
+                        "hasOption" : true,
+                        "tags" : ["BEST"]
                     },
                     {
                         "menuId" : 2,
-                        "name" : "페퍼로니 피자",
+                        "menuName" : "페퍼로니 피자",
                         "price" : 9000,
-                        "image" : "https://image.table-order.com/1_2.jpg",
-                        "recommend" : true,
-                        "sale" : true,
                         "salePrice" : 8500,
-                        "soldOut" : false,
-                        "option" : true,
+                        "image" : "https://image.table-order.com/1_2.jpg",                        
+                        "isSoldOut" : false,
+                        "hasOption" : true,
+                        "tags" : ["NEW"]
                     },
                 ]
             },
@@ -63,13 +80,12 @@ Authorization: Basic {{apiKey}}
                 "menu" : [
                     {
                         "menuId" : 3,
-                        "name" : "치즈 오븐 스파게티",
+                        "menuName" : "치즈 오븐 스파게티",
                         "price" : 4000,
-                        "image" : "https://image.table-order.com/1_3.jpg",
-                        "recommend" : false,
-                        "sale" : false,
-                        "soldOut" : false,
-                        "option" : false,
+                        "image" : "https://image.table-order.com/1_3.jpg",                        
+                        "isSoldOut" : false,
+                        "hasOption" : false,
+                        "tags" : ["BEST", "SPICY"]
                     },
                 ]
             }
@@ -77,120 +93,165 @@ Authorization: Basic {{apiKey}}
     }
     ```
 
-## 옵션 조회
-- API : GET /menu/{{storeId}}/option/{{menuId}}
+## 상세 조회
+- API : GET /menu/{{menuId}}
 - Request 
 - Response
     ```json
     {
-        "code" : "01",
+        "code" : 200,
+        "message" : "",
+        "data" : {
+            "menuId" : 2,
+            "name" : "페퍼로니 피자",
+            "description" : "짭짤한 페퍼로니가 들어간 피자",
+            "price" : 9000,
+            "salePrice" : 8500,
+            "image" : "https://image.table-order.com/1_2.jpg",
+            "tags" : ["NEW"],
+            "options" : [
+                {
+                    "categoryId" : 1,
+                    "categoryName" : "토핑",
+                    "isMultiple" : true,
+                    "maxSelect" : 0, // 0은 수량 제한 없음.
+                    "options" : [
+                        {
+                            "optionId" : 1,
+                            "optionName" : "치즈 추가",
+                            "price" : 1000,
+                            "image" : "",
+                            "isSoldOut" : false,
+                            "isOnlyOne" : false,
+                            "tags" : ["BEST"]
+                        },
+                        {
+                            "optionId" : 2,
+                            "optionName" : "페퍼로니 추가",
+                            "price" : 1000,
+                            "image" : "",
+                            "isSoldOut" : false,
+                            "isOnlyOne" : false,
+                            "tags" : []
+                        },
+                    ]
+                },
+                {
+                    "categoryId" : 2,
+                    "categoryName" : "엣지",
+                    "isMultiple" : false,
+                    "options" : [
+                        {
+                            "optionId" : 3,
+                            "optionName" : "치즈 크러스트 변경",
+                            "price" : 2500,
+                            "image" : "",
+                            "isSoldOut" : false,
+                            "isOnlyOne" : true,
+                            "tags" : ["BEST"]
+                        },
+                        {
+                            "optionId" : 4,
+                            "optionName" : "치즈 바이트 변경",
+                            "price" : 3000,
+                            "image" : "",
+                            "isSoldOut" : false,
+                            "isOnlyOne" : true,
+                            "tags" : ["BEST"]
+                        },
+                    ]
+                },
+            ]
+        }
+    }
+    ```
+
+## 직원 호출 메뉴 조회
+- API : GET /menu/call
+- Request 
+- Response
+    ```json
+    {
+        "code" : 200,
         "message" : "",
         "data" : [
             {
-                "categoryId" : 1,
-                "categoryName" : "토핑",
-                "multiple" : true,
-                "maxSelect" : 0, // 0은 수량 제한 없음.
-                "options" : [
-                    {
-                        "optionId" : 1,
-                        "name" : "치즈 추가",
-                        "price" : 1000,
-                        "image" : "",
-                        "recommend" : true,
-                        "sale" : false,
-                        "soldOut" : false,
-                        "onlyOne" : false,
-                    },
-                    {
-                        "optionId" : 2,
-                        "name" : "페퍼로니 추가",
-                        "price" : 1000,
-                        "image" : "",
-                        "recommend" : true,
-                        "sale" : false,
-                        "soldOut" : false,
-                        "onlyOne" : false,
-                    },
-                ]
+                "callId" : 1,
+                "name" : "물"
             },
             {
-                "categoryId" : 2,
-                "categoryName" : "엣지",
-                "multiple" : false,
-                "options" : [
-                    {
-                        "optionId" : 3,
-                        "name" : "치즈 크러스트 변경",
-                        "price" : 2500,
-                        "image" : "",
-                        "recommend" : true,
-                        "sale" : false,
-                        "soldOut" : false,
-                        "onlyOne" : true,
-                    },
-                    {
-                        "optionId" : 4,
-                        "name" : "치즈 바이트 변경",
-                        "price" : 3000,
-                        "image" : "",
-                        "recommend" : false,
-                        "sale" : false,
-                        "soldOut" : false,
-                        "onlyOne" : true,
-                    },
-                ]
+                "callId" : 2,
+                "name" : "젓가락"
+            },
+            {
+                "callId" : 3,
+                "name" : "호출"
             },
         ]
     }
     ```
 
-## 직원 호출 메뉴 조회
-- API : GET /menu/{{storeId}}/call
-
 
 # 3. Order
 
 ## 주문
-- API : POST /order/{{storeId}}/table/{{tableId}}
+- API : POST /order/table/{{tableId}}
 - Request 
     ```json
-    {
-        "totalPrice" : 18500, // 백엔드에서 호출 되기 전에 데이터가 바뀔 수도 있어서 고객이 화면에서 결제할 당시 금액으로
+    {      
+        // API 호출 되기 전에 데이터가 바뀔 수도 있어서 고객이 화면에서 결제할 당시 금액으로  
         "menu" : [
             {
                 "menuId" : 2,
                 "quantity" : 1,
+                "price" : 8500,
                 "options" : [
                     {
                         "optionId" : 1,
-                        "quantity" : 1
+                        "quantity" : 1,
+                        "price" : 1000
                     },
                     {
                         "optionId" : 2,
-                        "quantity" : 2
+                        "quantity" : 2,
+                        "price" : 1000
                     },
                     {
                         "optionId" : 4,
-                        "quantity" : 1
+                        "quantity" : 1,
+                        "price" : 4000
                     },
                 ]
             },
             {
                 "menuId" : 3,
                 "quantity" : 2,
-                "options" : []
+                "options" : [],
+                "price" : 4000
             }
         ]
     }
     ```
 - Response
     ```json
-        {
-            "code" : "01",
-            "message" : "",
-        }
+    {
+        "code" : 200,
+        "message" : "",
+    }
     ```
 
 ## 직원 호출
-- API : POST /order/{{storeId}}/table/{{tableId}}/call
+- API : POST /order/table/{{tableId}}/call
+- Request 
+    ```json
+    {
+        "callId" : 3
+    }
+    ```
+- Response
+    ```json
+    {
+        "code" : 200,
+        "message" : "",
+    }
+    ```
