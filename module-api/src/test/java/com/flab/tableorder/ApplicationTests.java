@@ -1,0 +1,28 @@
+package com.flab.tableorder;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+
+
+@SpringBootTest
+@AutoConfigureMockMvc
+class ApplicationTests {
+	@Autowired
+	private MockMvc mockMvc;
+
+	@Test
+	void getMenu() throws Exception {
+		mockMvc.perform(get("/menu"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.code").value(200))
+				.andExpect((ResultMatcher) jsonPath("$.data[0].menu[1].price").value(9000));
+	}
+
+}

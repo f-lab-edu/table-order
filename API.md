@@ -103,7 +103,7 @@ Authorization: Bearer {{apiKey}}
         "message" : "",
         "data" : {
             "menuId" : 2,
-            "name" : "페퍼로니 피자",
+            "menuName" : "페퍼로니 피자",
             "description" : "짭짤한 페퍼로니가 들어간 피자",
             "price" : 9000,
             "salePrice" : 8500,
