@@ -13,4 +13,9 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.24'
     // 컴파일 시 애노테이션 처리에 사용 @getter, @setter
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+    // compile 시점에서만 lombok을 쓰겠다.
+    testCompileOnly 'org.projectlombok:lombok:1.18.24'
+    // 컴파일 시 애노테이션 처리에 사용 @getter, @setter
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
 }

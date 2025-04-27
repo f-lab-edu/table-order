@@ -8,3 +8,11 @@ dependencies {
     // 테스트 런타임 설정
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
+
+test {
+    useJUnitPlatform()  // JUnit5를 사용하려면 반드시 설정이 필요
+
+    testLogging {
+        events "passed", "failed"
+    }
+}

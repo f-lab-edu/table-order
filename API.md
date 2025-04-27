@@ -5,10 +5,20 @@
 2. 주문 내역은 API 호출로 가져오는 것이 나을지 Front에서 갖고 있는 것이 나을지  
 3. 선 결제 방식일 땐 테이블의 주문 내역 clear는 어떻게 하는게 나은가? => POS에 테이블을 똑같이 보여주니까 직원이 clear하는 걸로?
 
+# version
+- 2025.04.16 : API 추가
+  - PATCH /menu/table/{tableId}/language
+  - GET /menu
+  - GET /menu/{menuId}
+  - GET /menu/call
+  - POST /order/table/{tableId}
+  - POST /order/table/{tableId}/call
+- 2025.04.27 : isRequired 필드 추가 
+
 # header
 ```
 Content-Type: application/json
-Authorization: Bearer {{apiKey}}
+Authorization: Bearer {apiKey}
 ```
 # 에러 Reposne
 ```json
@@ -25,18 +35,18 @@ Authorization: Bearer {{apiKey}}
 # 2. Menu
 
 ## 언어 변경
-- API : PATCH /menu/table/{{tableId}}/language
+- API : PATCH /menu/table/{tableId}/language
 - Request
     ```json
     {
-        "language" : "en"
+        "language" : "en"    
     }
     ```
 - Response
     ```json
     {
         "code" : 200,
-        "message" : "",
+        "message" : ""
     }
     ```
 
@@ -71,7 +81,7 @@ Authorization: Bearer {{apiKey}}
                         "isSoldOut" : false,
                         "hasOption" : true,
                         "tags" : ["NEW"]
-                    },
+                    }
                 ]
             },
             {
@@ -86,7 +96,7 @@ Authorization: Bearer {{apiKey}}
                         "isSoldOut" : false,
                         "hasOption" : false,
                         "tags" : ["BEST", "SPICY"]
-                    },
+                    }
                 ]
             }
         ]
@@ -94,7 +104,7 @@ Authorization: Bearer {{apiKey}}
     ```
 
 ## 상세 조회
-- API : GET /menu/{{menuId}}
+- API : GET /menu/{menuId}
 - Request 
 - Response
     ```json
@@ -103,7 +113,7 @@ Authorization: Bearer {{apiKey}}
         "message" : "",
         "data" : {
             "menuId" : 2,
-            "name" : "페퍼로니 피자",
+            "menuName" : "페퍼로니 피자",
             "description" : "짭짤한 페퍼로니가 들어간 피자",
             "price" : 9000,
             "salePrice" : 8500,
@@ -114,6 +124,7 @@ Authorization: Bearer {{apiKey}}
                     "categoryId" : 1,
                     "categoryName" : "토핑",
                     "isMultiple" : true,
+                    "isRequired" : false,
                     "maxSelect" : 0, // 0은 수량 제한 없음.
                     "options" : [
                         {
@@ -133,13 +144,14 @@ Authorization: Bearer {{apiKey}}
                             "isSoldOut" : false,
                             "isOnlyOne" : false,
                             "tags" : []
-                        },
+                        }
                     ]
                 },
                 {
                     "categoryId" : 2,
                     "categoryName" : "엣지",
                     "isMultiple" : false,
+                    "isRequired" : false,
                     "options" : [
                         {
                             "optionId" : 3,
@@ -158,9 +170,9 @@ Authorization: Bearer {{apiKey}}
                             "isSoldOut" : false,
                             "isOnlyOne" : true,
                             "tags" : ["BEST"]
-                        },
+                        }
                     ]
-                },
+                }
             ]
         }
     }
@@ -177,16 +189,16 @@ Authorization: Bearer {{apiKey}}
         "data" : [
             {
                 "callId" : 1,
-                "name" : "물"
+                "callName" : "물"
             },
             {
                 "callId" : 2,
-                "name" : "젓가락"
+                "callName" : "젓가락"
             },
             {
                 "callId" : 3,
-                "name" : "호출"
-            },
+                "callName" : "호출"
+            }
         ]
     }
     ```
@@ -195,7 +207,7 @@ Authorization: Bearer {{apiKey}}
 # 3. Order
 
 ## 주문
-- API : POST /order/table/{{tableId}}
+- API : POST /order/table/{tableId}
 - Request 
     ```json
     {      
@@ -220,7 +232,7 @@ Authorization: Bearer {{apiKey}}
                         "optionId" : 4,
                         "quantity" : 1,
                         "price" : 4000
-                    },
+                    }
                 ]
             },
             {
@@ -236,22 +248,22 @@ Authorization: Bearer {{apiKey}}
     ```json
     {
         "code" : 200,
-        "message" : "",
+        "message" : ""
     }
     ```
 
 ## 직원 호출
-- API : POST /order/table/{{tableId}}/call
+- API : POST /order/table/{tableId}/call
 - Request 
     ```json
     {
-        "callId" : 3
+        "call" : [1, 3] 
     }
     ```
 - Response
     ```json
     {
         "code" : 200,
-        "message" : "",
+        "message" : ""
     }
     ```
