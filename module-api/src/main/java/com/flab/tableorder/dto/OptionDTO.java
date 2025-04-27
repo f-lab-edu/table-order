@@ -6,12 +6,13 @@ import lombok.*;
 @Getter
 @Setter
 public class OptionDTO {
-	private long optionId;
-	private String optionName;
-	private int quantity;
-	private int price;
-	private String image;
-	private boolean isSoldOut;
-	private boolean isOnlyOne;
+	private long optionId = 0;
+	private String optionName = "";
+	private int quantity = 0;
+	private int price = 0;
+	private String image = "";
+	private boolean isSoldOut = false;
+	//	isOnlyOne == true : 한 개만 선택 가능
+	private boolean isOnlyOne = false;
 	private List<String> tags;
 }

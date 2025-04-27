@@ -5,6 +5,16 @@
 2. 주문 내역은 API 호출로 가져오는 것이 나을지 Front에서 갖고 있는 것이 나을지  
 3. 선 결제 방식일 땐 테이블의 주문 내역 clear는 어떻게 하는게 나은가? => POS에 테이블을 똑같이 보여주니까 직원이 clear하는 걸로?
 
+# version
+- 2025.04.16 : API 추가
+  - PATCH /menu/table/{tableId}/language
+  - GET /menu
+  - GET /menu/{menuId}
+  - GET /menu/call
+  - POST /order/table/{tableId}
+  - POST /order/table/{tableId}/call
+- 2025.04.27 : isRequired 필드 추가 
+
 # header
 ```
 Content-Type: application/json
@@ -29,14 +39,14 @@ Authorization: Bearer {apiKey}
 - Request
     ```json
     {
-        "language" : "en"
+        "language" : "en"    
     }
     ```
 - Response
     ```json
     {
         "code" : 200,
-        "message" : "",
+        "message" : ""
     }
     ```
 
@@ -71,7 +81,7 @@ Authorization: Bearer {apiKey}
                         "isSoldOut" : false,
                         "hasOption" : true,
                         "tags" : ["NEW"]
-                    },
+                    }
                 ]
             },
             {
@@ -86,7 +96,7 @@ Authorization: Bearer {apiKey}
                         "isSoldOut" : false,
                         "hasOption" : false,
                         "tags" : ["BEST", "SPICY"]
-                    },
+                    }
                 ]
             }
         ]
@@ -114,6 +124,7 @@ Authorization: Bearer {apiKey}
                     "categoryId" : 1,
                     "categoryName" : "토핑",
                     "isMultiple" : true,
+                    "isRequired" : false,
                     "maxSelect" : 0, // 0은 수량 제한 없음.
                     "options" : [
                         {
@@ -133,13 +144,14 @@ Authorization: Bearer {apiKey}
                             "isSoldOut" : false,
                             "isOnlyOne" : false,
                             "tags" : []
-                        },
+                        }
                     ]
                 },
                 {
                     "categoryId" : 2,
                     "categoryName" : "엣지",
                     "isMultiple" : false,
+                    "isRequired" : false,
                     "options" : [
                         {
                             "optionId" : 3,
@@ -158,9 +170,9 @@ Authorization: Bearer {apiKey}
                             "isSoldOut" : false,
                             "isOnlyOne" : true,
                             "tags" : ["BEST"]
-                        },
+                        }
                     ]
-                },
+                }
             ]
         }
     }
@@ -186,7 +198,7 @@ Authorization: Bearer {apiKey}
             {
                 "callId" : 3,
                 "callName" : "호출"
-            },
+            }
         ]
     }
     ```
@@ -220,7 +232,7 @@ Authorization: Bearer {apiKey}
                         "optionId" : 4,
                         "quantity" : 1,
                         "price" : 4000
-                    },
+                    }
                 ]
             },
             {
@@ -236,7 +248,7 @@ Authorization: Bearer {apiKey}
     ```json
     {
         "code" : 200,
-        "message" : "",
+        "message" : ""
     }
     ```
 
@@ -252,6 +264,6 @@ Authorization: Bearer {apiKey}
     ```json
     {
         "code" : 200,
-        "message" : "",
+        "message" : ""
     }
     ```

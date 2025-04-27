@@ -8,6 +8,6 @@ import java.util.List;
 @Getter
 @Setter
 public class CallDTO {
-	private long callId;
-	private String callName;
+	private long callId = 0;
+	private String callName = "";
 }
