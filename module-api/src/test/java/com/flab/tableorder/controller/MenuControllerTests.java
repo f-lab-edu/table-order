@@ -22,7 +22,7 @@ class MenuControllerTests {
 		mockMvc.perform(get("/menu"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.code").value(200))
-//			.andExpect(jsonPath("$.data[0].menu[1].price").value(not(0)));
+//			.andExpect(jsonPath("$.data[0].menu[1].price").value(not(0)))
 		;
 	}
 
@@ -33,6 +33,7 @@ class MenuControllerTests {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.code").value(200))
 			.andExpect(jsonPath("$.data.menuId").value(menuId))
+			.andExpect(jsonPath("$.data.price", greaterThan(0)))
 		;
 	}
 
