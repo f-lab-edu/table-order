@@ -9,6 +9,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.*;
 
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -50,8 +51,8 @@ class OrderControllerTests {
 				.content(requestData.toString())
 			)
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.code").value(200));
-
+			.andExpect(jsonPath("$.code").value(200))
+		;
 	}
 
 	@Test
@@ -63,6 +64,7 @@ class OrderControllerTests {
 				.content(jsonRequest)
 			)
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.code").value(200));
+			.andExpect(jsonPath("$.code").value(200))
+		;
 	}
 }
