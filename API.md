@@ -8,7 +8,7 @@
 # header
 ```
 Content-Type: application/json
-Authorization: Bearer {{apiKey}}
+Authorization: Bearer {apiKey}
 ```
 # 에러 Reposne
 ```json
@@ -25,7 +25,7 @@ Authorization: Bearer {{apiKey}}
 # 2. Menu
 
 ## 언어 변경
-- API : PATCH /menu/table/{{tableId}}/language
+- API : PATCH /menu/table/{tableId}/language
 - Request
     ```json
     {
@@ -94,7 +94,7 @@ Authorization: Bearer {{apiKey}}
     ```
 
 ## 상세 조회
-- API : GET /menu/{{menuId}}
+- API : GET /menu/{menuId}
 - Request 
 - Response
     ```json
@@ -177,15 +177,15 @@ Authorization: Bearer {{apiKey}}
         "data" : [
             {
                 "callId" : 1,
-                "name" : "물"
+                "callName" : "물"
             },
             {
                 "callId" : 2,
-                "name" : "젓가락"
+                "callName" : "젓가락"
             },
             {
                 "callId" : 3,
-                "name" : "호출"
+                "callName" : "호출"
             },
         ]
     }
@@ -195,7 +195,7 @@ Authorization: Bearer {{apiKey}}
 # 3. Order
 
 ## 주문
-- API : POST /order/table/{{tableId}}
+- API : POST /order/table/{tableId}
 - Request 
     ```json
     {      
@@ -241,11 +241,11 @@ Authorization: Bearer {{apiKey}}
     ```
 
 ## 직원 호출
-- API : POST /order/table/{{tableId}}/call
+- API : POST /order/table/{tableId}/call
 - Request 
     ```json
     {
-        "callId" : 3
+        "call" : [1, 3] 
     }
     ```
 - Response

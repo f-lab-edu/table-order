@@ -9,6 +9,11 @@ public class ResponseDTO<T> {
 	private String message;
 	private T data;
 
+	public ResponseDTO(int code, String message) {
+		this.code = code;
+		this.message = message;
+	}
+
 	public ResponseDTO(int code, String message, T data) {
 		this.code = code;
 		this.message = message;

@@ -16,5 +16,5 @@ public class MenuDTO {
 	private boolean isSoldOut;
 	private boolean hasOption;
 	private List<String> tags;
-	private OptionDTO[] options;
+	private List<OptionCategoryDTO> options;
 }
