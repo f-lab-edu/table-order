@@ -11,9 +11,12 @@ public class OptionCategory {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long optionCategoryId;
+	private Long categoryId;
 
-	private String optionCategoryName;
+	private String categoryName;
+	private boolean multiple;
+	private boolean required;
+	private int maxSelect;
 
 	@OneToMany(cascade = CascadeType.ALL)
 	private List<Option> options;

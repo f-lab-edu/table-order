@@ -18,8 +18,8 @@ public class Menu {
     private int price;
     private int salePrice;
     private String image;
-    private boolean isSoldOut;
-    private boolean hasOption;
+    private boolean soldOut;
+    private boolean optionEnabled;
 
     @ElementCollection
     private List<String> tags;

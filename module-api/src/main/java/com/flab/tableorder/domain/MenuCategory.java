@@ -13,6 +13,9 @@ public class MenuCategory {
     private Long categoryId;
 
     private String categoryName;
+    private boolean multiple;
+    private boolean required;
+    private int maxSelect;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Menu> menu;

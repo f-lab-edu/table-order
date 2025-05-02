@@ -70,7 +70,7 @@ Authorization: Bearer {apiKey}
                         "price" : 8000,
                         "image" : "https://image.table-order.com/1_1.jpg",                        
                         "isSoldOut" : false,
-                        "hasOption" : true,
+                        "isOptionEnabled" : true,
                         "tags" : ["BEST"]
                     },
                     {
@@ -80,7 +80,7 @@ Authorization: Bearer {apiKey}
                         "salePrice" : 8500,
                         "image" : "https://image.table-order.com/1_2.jpg",                        
                         "isSoldOut" : false,
-                        "hasOption" : true,
+                        "isOptionEnabled" : true,
                         "tags" : ["NEW"]
                     }
                 ]
@@ -95,7 +95,7 @@ Authorization: Bearer {apiKey}
                         "price" : 4000,
                         "image" : "https://image.table-order.com/1_3.jpg",                        
                         "isSoldOut" : false,
-                        "hasOption" : false,
+                        "isOptionEnabled" : false,
                         "tags" : ["BEST", "SPICY"]
                     }
                 ]

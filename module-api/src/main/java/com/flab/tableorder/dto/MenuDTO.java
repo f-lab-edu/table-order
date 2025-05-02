@@ -1,10 +1,12 @@
 package com.flab.tableorder.dto;
 
 import java.util.List;
+
 import lombok.*;
 
-@Getter
-@Setter
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@Getter @Setter
 public class MenuDTO {
 	private long menuId = 0;
 	private String menuName = "";
@@ -13,8 +15,10 @@ public class MenuDTO {
 	private int price = 0;
 	private int salePrice = 0;
 	private String image = "";
-	private boolean isSoldOut = false;
-	private boolean hasOption = false;
+	@JsonProperty("isSoldOut")
+	private boolean soldOut = false;
+	@JsonProperty("isOptionEnabled")
+	private boolean optionEnabled = false;
 	private List<String> tags;
 	private List<OptionCategoryDTO> options;
 }
