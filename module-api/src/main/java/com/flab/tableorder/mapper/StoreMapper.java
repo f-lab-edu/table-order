@@ -3,7 +3,7 @@ package com.flab.tableorder.mapper;
 import com.flab.tableorder.dto.*;
 import com.flab.tableorder.domain.*;
 
-import org.mapstruct.Mapper;
+import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
 @Mapper
