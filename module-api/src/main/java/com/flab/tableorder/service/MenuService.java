@@ -32,4 +32,11 @@ public class MenuService {
 		return MenuMapper.INSTANCE.toDTO(categories);
 	}
 
+	@Transactional(readOnly = true)
+	public MenuDTO getMenu(Long menuId) {
+		Menu menu = menuRepository.findByMenuIdAndStore_StoreId(StoreContext.getStoreId(), menuId)
+				.orElseThrow(() -> new EntityNotFoundException("Menu not found"));
+
+		return MenuMapper.INSTANCE.toDTO(menu);
+	}
 }
