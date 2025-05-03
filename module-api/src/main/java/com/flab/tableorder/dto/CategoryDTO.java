@@ -2,7 +2,7 @@ package com.flab.tableorder.dto;
 
 import lombok.*;
 
-@Getter @Setter
+@Getter @Setter @Data
 public class CategoryDTO {
 	private long categoryId = 0;
 	private String categoryName = "";

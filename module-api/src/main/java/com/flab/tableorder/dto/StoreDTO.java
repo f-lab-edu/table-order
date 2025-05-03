@@ -4,7 +4,7 @@ import java.util.*;
 
 import lombok.*;
 
-@Getter @Setter
+@Getter @Setter @Data
 public class StoreDTO {
 	private long storeId = 0;
 	private String apiKey = "";

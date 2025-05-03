@@ -4,7 +4,7 @@ import java.util.List;
 
 import lombok.*;
 
-@Getter @Setter
+@Getter @Setter @Data
 public class OptionDTO {
 	private long optionId = 0;
 	private String optionName = "";

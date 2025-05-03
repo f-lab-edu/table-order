@@ -6,7 +6,7 @@ import lombok.*;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Getter @Setter
+@Getter @Setter @Data
 public class MenuDTO {
 	private long menuId = 0;
 	private String menuName = "";
