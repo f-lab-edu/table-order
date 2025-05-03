@@ -8,6 +8,7 @@ import com.flab.tableorder.dto.*;
 
 import java.util.*;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,10 +25,10 @@ import org.springframework.http.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Slf4j
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ApiKeyInterceptorTest {
 	@LocalServerPort
 	private int port;
@@ -42,7 +43,7 @@ public class ApiKeyInterceptorTest {
 
 	@BeforeAll
 	void init() {
-		this.url = "http://localhost:" + port;
+		this.url = "http://localhost:" + port + "/menu";
 
 		Store store = new Store();
 		store.setStoreId(this.storeId);
@@ -51,20 +52,10 @@ public class ApiKeyInterceptorTest {
 		storeRepository.save(store);
 	}
 
-
-	private ResponseDTO getResponseData(HttpEntity httpEntity) {
-		ResponseEntity<ResponseDTO> responseEntity = restTemplate.exchange(
-					this.url + "/menu",
-					HttpMethod.GET,
-					httpEntity,
-					new ParameterizedTypeReference<ResponseDTO>() {}
-				);
-		return responseEntity.getBody();
-	}
-
 	@Test
 	void APIKey_NoAuthorization() {
-		assertThat(getResponseData(null).getCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+		Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, null);
+		assertThat(responseData.get("code")).isEqualTo(HttpStatus.UNAUTHORIZED.value());
 	}
 
 	@Test
@@ -74,9 +65,9 @@ public class ApiKeyInterceptorTest {
 
 		HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
 
-		ResponseDTO responseBody = getResponseData(httpEntity);
-		assertThat(responseBody.getCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
-		assertThat(responseBody.getMessage()).isEqualTo("Api Key not found");
+		Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, httpEntity);
+		assertThat(responseData.get("code")).isEqualTo(HttpStatus.NOT_FOUND.value());
+		assertThat(responseData.get("message")).isEqualTo("Api Key not found");
 	}
 
 	@Test
@@ -86,10 +77,10 @@ public class ApiKeyInterceptorTest {
 
 		HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
 
-		ResponseDTO responseBody = getResponseData(httpEntity);
-		assertThat(responseBody.getCode()).isEqualTo(HttpStatus.OK.value());
+		Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, httpEntity);
+		assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
 
-		responseBody = getResponseData(httpEntity);
-		assertThat(responseBody.getCode()).isEqualTo(HttpStatus.OK.value());
+		responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, httpEntity);
+		assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
 	}
 }

@@ -1,5 +1,6 @@
 package com.flab.tableorder.service;
 
+import com.flab.tableorder.DataLoader;
 import com.flab.tableorder.context.StoreContext;
 import com.flab.tableorder.domain.*;
 import com.flab.tableorder.dto.*;
@@ -23,17 +24,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 public class MenuServiceTest {
-	private final ObjectMapper objectMapper = new ObjectMapper();
-
 	@Mock
 	private StoreRepository storeRepository;
 	@Mock
 	private MenuRepository menuRepository;
+
 	@InjectMocks
 	private MenuService menuService;
+	
+	private final ObjectMapper objectMapper = new ObjectMapper();
+
 
 	@Test
 	void getAllMenu_NotFound() {
+		StoreContext.setStoreId(0L);
 		Assertions.assertThrows(EntityNotFoundException.class, () -> {
 			menuService.getAllMenu();
 		});
@@ -41,7 +45,7 @@ public class MenuServiceTest {
 
 	@Test
 	void getAllMenu_Success() throws IOException {
-		Store mockStore = getStoreInfo();
+		Store mockStore = DataLoader.getStoreInfo(objectMapper);
 		Long storeId = mockStore.getStoreId();
 		StoreContext.setStoreId(storeId);
 
@@ -50,16 +54,32 @@ public class MenuServiceTest {
 		List<MenuCategoryDTO> menu = menuService.getAllMenu();
 
 		assertThat(menu).isNotNull();
-		assertThat(menu.size()).isSameAs(mockStore.getCategories().size());
+		assertThat(menu).isEqualTo(MenuMapper.INSTANCE.toDTO(mockStore.getCategories()));
 	}
 
-	public Store getStoreInfo() throws IOException {
-		InputStream inputStream = getClass().getResourceAsStream("/store_1.json");
+	@Test
+	void getMenu_NotFound() throws IOException {
+		StoreContext.setStoreId(0L);
+		Assertions.assertThrows(EntityNotFoundException.class, () -> {
+			menuService.getMenu(0L);
+		});
+	}
 
-		StoreDTO storeDTO = objectMapper.readValue(inputStream, new TypeReference<>() {});
-		Store store = StoreMapper.INSTANCE.toEntity(storeDTO);
+	@Test
+	void getMenu_Success() throws IOException {
+		Store mockStore = DataLoader.getStoreInfo(objectMapper);
+		Long storeId = mockStore.getStoreId();
+		StoreContext.setStoreId(storeId);
 
-		return store;
+		Menu mockMenu = mockStore.getCategories().get(0).getMenu().get(0);
+		Long menuId = mockMenu.getMenuId();
+
+		when(menuRepository.findByMenuIdAndStore_StoreId(storeId, menuId)).thenReturn(Optional.of(mockMenu));
+
+		MenuDTO menu = menuService.getMenu(menuId);
+
+		assertThat(menu).isNotNull();
+		assertThat(menu).isEqualTo(MenuMapper.INSTANCE.toDTO(mockMenu));
 	}
 
 }
