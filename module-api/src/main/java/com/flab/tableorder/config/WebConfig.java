@@ -10,11 +10,15 @@ import org.springframework.web.servlet.config.annotation.*;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 	private final ApiKeyInterceptor apiKeyInterceptor;
+	private final ResquestInterceptor resquestInterceptor;
 
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(resquestInterceptor)
+				.addPathPatterns("/**");
+
 		registry.addInterceptor(apiKeyInterceptor)
-				.addPathPatterns("/**"); // 또는 전체 경로
+				.addPathPatterns("/**");
 	}
 }
