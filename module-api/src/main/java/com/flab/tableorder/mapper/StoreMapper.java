@@ -6,7 +6,7 @@ import com.flab.tableorder.domain.*;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface StoreMapper {
 
     StoreMapper INSTANCE = Mappers.getMapper(StoreMapper.class);
