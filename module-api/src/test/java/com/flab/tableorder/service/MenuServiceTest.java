@@ -28,6 +28,8 @@ public class MenuServiceTest {
 	private StoreRepository storeRepository;
 	@Mock
 	private MenuRepository menuRepository;
+	@Mock
+	private MenuCategoryRepository menuCategoryRepository;
 
 	@InjectMocks
 	private MenuService menuService;
@@ -49,7 +51,7 @@ public class MenuServiceTest {
 		Long storeId = mockStore.getStoreId();
 		StoreContext.setStoreId(storeId);
 
-		when(storeRepository.findByStoreId(storeId)).thenReturn(Optional.of(mockStore));
+		when(menuCategoryRepository.findAllByStore_StoreId(storeId)).thenReturn(mockStore.getCategories());
 
 		List<MenuCategoryDTO> menu = menuService.getAllMenu();
 
