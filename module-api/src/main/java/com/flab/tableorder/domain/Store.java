@@ -2,8 +2,10 @@ package com.flab.tableorder.domain;
 
 import java.util.*;
 
-import jakarta.persistence.*;
 import lombok.*;
+import jakarta.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Getter @Setter
@@ -14,6 +16,7 @@ public class Store {
 
     private String apiKey;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<MenuCategory> categories = new ArrayList<>();
 }

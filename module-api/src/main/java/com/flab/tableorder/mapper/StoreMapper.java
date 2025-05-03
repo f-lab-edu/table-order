@@ -12,4 +12,18 @@ public interface StoreMapper {
     StoreMapper INSTANCE = Mappers.getMapper(StoreMapper.class);
 
     Store toEntity(StoreDTO storeDTO);
+    StoreDTO toDTO(Store store);
+
+    @AfterMapping
+    default void linkEntities(@MappingTarget Store store) {
+        for (MenuCategory category : store.getCategories()) {
+            if (category.getStore() != null) continue;
+
+            category.setStore(store);
+            for (Menu menu : category.getMenu()) {
+                if (menu.getCategory() == null) menu.setCategory(category);
+                if (menu.getStore() == null) menu.setStore(store);
+            }
+        }
+    }
 }

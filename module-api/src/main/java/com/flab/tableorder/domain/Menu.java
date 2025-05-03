@@ -2,8 +2,10 @@ package com.flab.tableorder.domain;
 
 import java.util.*;
 
-import jakarta.persistence.*;
 import lombok.*;
+import jakarta.persistence.*;
+
+import com.fasterxml.jackson.annotation.*;
 
 @Entity
 @Getter @Setter
@@ -27,11 +29,13 @@ public class Menu {
     @OneToMany(cascade = CascadeType.ALL)
     private List<OptionCategory> options = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
+    @JsonBackReference
     private MenuCategory category;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id")
+    @JsonBackReference
     private Store store;
 }
