@@ -34,9 +34,6 @@ public class MenuServiceTest {
 	@InjectMocks
 	private MenuService menuService;
 	
-	private final ObjectMapper objectMapper = new ObjectMapper();
-
-
 	@Test
 	void getAllMenu_NotFound() {
 		StoreContext.setStoreId(0L);
@@ -47,7 +44,7 @@ public class MenuServiceTest {
 
 	@Test
 	void getAllMenu_Success() throws IOException {
-		Store mockStore = DataLoader.getStoreInfo(objectMapper);
+		Store mockStore = DataLoader.getStoreInfo("store_1.json");
 		Long storeId = mockStore.getStoreId();
 		StoreContext.setStoreId(storeId);
 
@@ -69,7 +66,7 @@ public class MenuServiceTest {
 
 	@Test
 	void getMenu_Success() throws IOException {
-		Store mockStore = DataLoader.getStoreInfo(objectMapper);
+		Store mockStore = DataLoader.getStoreInfo("store_1.json");
 		Long storeId = mockStore.getStoreId();
 		StoreContext.setStoreId(storeId);
 

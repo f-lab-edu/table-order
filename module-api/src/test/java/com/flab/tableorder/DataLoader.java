@@ -16,6 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
 public class DataLoader {
+	private static ObjectMapper objectMapper = new ObjectMapper();
 	public static Map<String, Object> getResponseData(TestRestTemplate restTemplate, String url, HttpMethod httpMethod, HttpEntity httpEntity) {
 		ResponseEntity<Map<String, Object>> responseEntity = restTemplate.exchange(
 					url,
@@ -26,8 +27,8 @@ public class DataLoader {
 		return responseEntity.getBody();
 	}
 
-	public static Store getStoreInfo(ObjectMapper objectMapper) {
-		InputStream inputStream = DataLoader.class.getResourceAsStream("/store_1.json");
+	public static Store getStoreInfo(String storeFile) {
+		InputStream inputStream = DataLoader.class.getResourceAsStream("/" + storeFile);
 
 		Store store = null;
 		try {

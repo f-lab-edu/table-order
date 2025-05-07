@@ -55,7 +55,7 @@ class MenuControllerTests {
 	@BeforeAll
 	void init() {
 		this.url = "http://localhost:" + port + "/menu";
-		this.store = DataLoader.getStoreInfo(objectMapper);
+		this.store = DataLoader.getStoreInfo("store_1.json");
 		if (store != null) {
 			storeRepository.save(store);
 			this.apiKey = store.getApiKey();
