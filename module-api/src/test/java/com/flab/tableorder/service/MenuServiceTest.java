@@ -39,6 +39,7 @@ public class MenuServiceTest {
 		Store mockStore = DataLoader.getStoreInfo("pizza.json");
 		ObjectId objectId = mockStore.getStoreId();
 		String storeId = objectId.toString();
+		when(categoryRepository.findAllByStoreId(storeId)).thenReturn(null);
 
 		List<MenuCategoryDTO> allMenu = menuService.getAllMenu(storeId);
 		assertThat(allMenu).isNotNull();
@@ -55,8 +56,12 @@ public class MenuServiceTest {
 
 
 		List<Category> categoryList = DataLoader.getCategoryList(fileName);
+		List<ObjectId> categoryIds = categoryList.stream()
+						.map(Category::getCategoryId)
+						.collect(Collectors.toList());
 
 		when(categoryRepository.findAllByStoreId(storeId)).thenReturn(categoryList);
+		when(menuRepository.findAllByCategoryIdIn(categoryIds)).thenReturn(null);
 
 		List<MenuCategoryDTO> allMenu = menuService.getAllMenu(storeId);
 
@@ -105,7 +110,6 @@ public class MenuServiceTest {
 
 	@Test
 	void getMenu_NotFound() throws IOException {
-//		StoreContext.setStoreId(0L);
 //		Assertions.assertThrows(EntityNotFoundException.class, () -> {
 //			menuService.getMenu(0L);
 //		});

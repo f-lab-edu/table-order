@@ -37,8 +37,10 @@ public class MenuService {
 
 		List<Menu> menuList = menuRepository.findAllByCategoryIdIn(categoryIds);
 
-		Map<String, List<Menu>> menuListMap = menuList.stream()
-				.collect(Collectors.groupingBy(menu -> menu.getCategoryId().toString()));
+		Map<String, List<Menu>> menuListMap = menuList == null
+				? new HashMap<>()
+				: menuList.stream()
+					.collect(Collectors.groupingBy(menu -> menu.getCategoryId().toString()));
 
 		List<MenuCategoryDTO> result = CategoryMapper.INSTANCE.toDTO(categoryList);
 
