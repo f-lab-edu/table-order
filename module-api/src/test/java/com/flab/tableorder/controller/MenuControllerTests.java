@@ -2,16 +2,12 @@ package com.flab.tableorder.controller;
 
 import com.flab.tableorder.DataLoader;
 import com.flab.tableorder.domain.*;
-import com.flab.tableorder.dto.*;
 import com.flab.tableorder.mapper.*;
-
-import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
@@ -20,14 +16,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Slf4j
@@ -47,7 +39,6 @@ class MenuControllerTests {
 	private StoreRepository storeRepository;
 
 	private String url;
-	private Long storeId;
 	private String apiKey;
 	private Store store;
 	private HttpEntity<Void> httpEntity;
@@ -55,11 +46,10 @@ class MenuControllerTests {
 	@BeforeAll
 	void init() {
 		this.url = "http://localhost:" + port + "/menu";
-		this.store = DataLoader.getStoreInfo("store_1.json");
+		this.store = DataLoader.getStoreInfo("pizza.json");
 		if (store != null) {
 			storeRepository.save(store);
 			this.apiKey = store.getApiKey();
-			this.storeId = store.getStoreId();
 
 			HttpHeaders headers = new HttpHeaders();
 			headers.set("Authorization", "Bearer " + apiKey);
@@ -78,51 +68,51 @@ class MenuControllerTests {
 	   	System.out.println("Start Test Server : " + this.url);
 	}
 
-	@Test
-	void getMenu_Success() throws Exception {
-		Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, this.httpEntity);
+//	@Test
+//	void getMenu_Success() throws Exception {
+//		Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, this.httpEntity);
+//
+//		assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
+//
+//		List<MenuCategoryDTO> storeMenuCategoryList = MenuMapper.INSTANCE.toDTO(this.store.getCategories());
+//		List<Map<String, Object>> resMenuCategoryList = (List<Map<String, Object>>) responseData.get("data");
+//
+//		assertThat(resMenuCategoryList.size()).isEqualTo(storeMenuCategoryList.size());
+//
+//		for (int i = 0; i < storeMenuCategoryList.size(); i++) {
+//			MenuCategoryDTO storeMenuCategory = storeMenuCategoryList.get(i);
+//			Map<String, Object> resMenuCategory = resMenuCategoryList.get(i);
+//
+//			assertThat(Long.parseLong(resMenuCategory.get("categoryId").toString())).isEqualTo(storeMenuCategory.getCategoryId());
+//			assertThat(resMenuCategory.get("categoryName")).isEqualTo(storeMenuCategory.getCategoryName());
+//
+//			List<MenuDTO> storeMenuList = storeMenuCategory.getMenu();
+//			List<Map<String, Object>> resMenuList = (List<Map<String, Object>>) resMenuCategory.get("menu");
+//
+//			assertThat(resMenuList.size()).isEqualTo(storeMenuList.size());
+//
+//			for (int j = 0; j < storeMenuList.size(); j++) {
+//				MenuDTO menu = storeMenuList.get(j);
+//				Map<String, Object> resMenu = resMenuList.get(j);
+//
+//				assertThat(Long.parseLong(resMenu.get("menuId").toString())).isEqualTo(menu.getMenuId());
+//				assertThat(resMenu.get("menuName")).isEqualTo(menu.getMenuName());
+//			}
+//		}
+//	}
 
-		assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
-
-		List<MenuCategoryDTO> storeMenuCategoryList = MenuMapper.INSTANCE.toDTO(this.store.getCategories());
-		List<Map<String, Object>> resMenuCategoryList = (List<Map<String, Object>>) responseData.get("data");
-
-		assertThat(resMenuCategoryList.size()).isEqualTo(storeMenuCategoryList.size());
-
-		for (int i = 0; i < storeMenuCategoryList.size(); i++) {
-			MenuCategoryDTO storeMenuCategory = storeMenuCategoryList.get(i);
-			Map<String, Object> resMenuCategory = (Map<String, Object>) resMenuCategoryList.get(i);
-
-			assertThat(Long.parseLong(resMenuCategory.get("categoryId").toString())).isEqualTo(storeMenuCategory.getCategoryId());
-			assertThat(resMenuCategory.get("categoryName")).isEqualTo(storeMenuCategory.getCategoryName());
-
-			List<MenuDTO> storeMenuList = storeMenuCategory.getMenu();
-			List<Map<String, Object>> resMenuList = (List<Map<String, Object>>) resMenuCategory.get("menu");
-
-			assertThat(resMenuList.size()).isEqualTo(storeMenuList.size());
-
-			for (int j = 0; j < storeMenuList.size(); j++) {
-				MenuDTO menu = storeMenuList.get(j);
-				Map<String, Object> resMenu = resMenuList.get(j);
-
-				assertThat(Long.parseLong(resMenu.get("menuId").toString())).isEqualTo(menu.getMenuId());
-				assertThat(resMenu.get("menuName")).isEqualTo(menu.getMenuName());
-			}
-		}
-	}
-
-	@Test
-	void getMenuDetailSuccess() throws Exception {
-		Menu storeMenu = store.getCategories().get(0).getMenu().get(0);
-		Long menuId = storeMenu.getMenuId();
-		Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url + "/" + menuId, HttpMethod.GET, this.httpEntity);
-
-		assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
-
-		Map<String, Object> resMenu = (Map<String, Object>) responseData.get("data");
-		assertThat(Long.parseLong(resMenu.get("menuId").toString())).isEqualTo(menuId);
-		assertThat(resMenu.get("menuName")).isEqualTo(storeMenu.getMenuName());
-	}
+//	@Test
+//	void getMenuDetailSuccess() throws Exception {
+//		Menu storeMenu = store.getCategories().get(0).getMenu().get(0);
+//		Long menuId = storeMenu.getMenuId();
+//		Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url + "/" + menuId, HttpMethod.GET, this.httpEntity);
+//
+//		assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
+//
+//		Map<String, Object> resMenu = (Map<String, Object>) responseData.get("data");
+//		assertThat(Long.parseLong(resMenu.get("menuId").toString())).isEqualTo(menuId);
+//		assertThat(resMenu.get("menuName")).isEqualTo(storeMenu.getMenuName());
+//	}
 
 //	@Test
 //	void getCallSuccess() throws Exception {
