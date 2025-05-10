@@ -2,12 +2,13 @@ package com.flab.tableorder.dto;
 
 import lombok.*;
 
-@Getter
-@Setter
+@Getter @Setter
 public class ResponseDTO<T> {
 	private int code;
 	private String message;
 	private T data;
+
+	public ResponseDTO() {}
 
 	public ResponseDTO(int code, String message) {
 		this.code = code;

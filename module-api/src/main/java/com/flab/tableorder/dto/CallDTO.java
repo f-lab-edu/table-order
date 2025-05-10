@@ -1,12 +1,8 @@
 package com.flab.tableorder.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-import java.util.List;
-
-@Getter
-@Setter
+@Getter @Setter @Data
 public class CallDTO {
 	private long callId = 0;
 	private String callName = "";
