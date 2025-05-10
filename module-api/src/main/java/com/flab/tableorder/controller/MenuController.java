@@ -1,5 +1,6 @@
 package com.flab.tableorder.controller;
 
+import com.flab.tableorder.context.StoreContext;
 import com.flab.tableorder.dto.*;
 import com.flab.tableorder.service.*;
 
@@ -20,7 +21,7 @@ public class MenuController {
 
     @GetMapping
     public ResponseEntity getAllMenu() {
-        List<MenuCategoryDTO> menuList = menuService.getAllMenu();
+        List<MenuCategoryDTO> menuList = menuService.getAllMenu(StoreContext.getStoreId());
 
         ResponseDTO responseData = new ResponseDTO<>(200, "", menuList);
 
@@ -28,8 +29,8 @@ public class MenuController {
     }
 
     @GetMapping("/{menuId}")
-    public ResponseEntity<ResponseDTO<MenuDTO>> getMenuByMenuId(@PathVariable Long menuId) {
-        MenuDTO menu = menuService.getMenu(menuId);
+    public ResponseEntity<ResponseDTO<MenuDTO>> getMenuByMenuId(@PathVariable String menuId) {
+        MenuDTO menu = menuService.getMenu(StoreContext.getStoreId(), menuId);
 
         ResponseDTO<MenuDTO> responseData = new ResponseDTO<>(200, "", menu);
 

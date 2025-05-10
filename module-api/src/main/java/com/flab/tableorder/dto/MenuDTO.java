@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Getter @Setter @Data
 public class MenuDTO {
-	private long menuId = 0;
+	private String menuId = "";
 	private String menuName = "";
 	private String description = "";
 	private int quantity = 0;

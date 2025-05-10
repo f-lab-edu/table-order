@@ -4,7 +4,7 @@ import lombok.*;
 
 @Getter @Setter @Data
 public class CategoryDTO {
-	private long categoryId = 0;
+	private String categoryId = "";
 	private String categoryName = "";
 	// multiple == true : 다중 선택
 	private boolean multiple = false;

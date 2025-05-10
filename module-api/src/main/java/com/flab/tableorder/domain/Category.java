@@ -7,10 +7,16 @@ import jakarta.persistence.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "store")
+@Document(collection = "category")
 @Getter @Setter
-public class Store {
+public class Category {
     @Id @JsonProperty("_id")
+    private ObjectId categoryId;
+
+    private String categoryName;
+    private boolean multiple;
+    private boolean required;
+    private int maxSelect;
+
     private ObjectId storeId;
-    private String apiKey;
 }

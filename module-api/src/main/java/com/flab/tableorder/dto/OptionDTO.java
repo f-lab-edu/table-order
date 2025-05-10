@@ -6,7 +6,7 @@ import lombok.*;
 
 @Getter @Setter @Data
 public class OptionDTO {
-	private long optionId = 0;
+	private String optionId = "";
 	private String optionName = "";
 	private int quantity = 0;
 	private int price = 0;

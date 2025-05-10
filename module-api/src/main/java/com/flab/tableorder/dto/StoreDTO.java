@@ -6,7 +6,7 @@ import lombok.*;
 
 @Getter @Setter @Data
 public class StoreDTO {
-	private long storeId = 0;
+	private String storeId = "";
 	private String apiKey = "";
 
 	private List<MenuCategoryDTO> categories;

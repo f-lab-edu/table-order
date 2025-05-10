@@ -7,12 +7,14 @@ import jakarta.persistence.*;
 
 import com.fasterxml.jackson.annotation.*;
 
-@Entity
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "menu")
 @Getter @Setter
 public class Menu {
-
-    @Id
-    private Long menuId;
+    @Id @JsonProperty("_id")
+    private ObjectId menuId;
 
     private String menuName;
     private String description;
@@ -22,20 +24,7 @@ public class Menu {
     private String image;
     private boolean soldOut;
     private boolean optionEnabled;
-
-    @ElementCollection
     private List<String> tags;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<OptionCategory> options = new ArrayList<>();
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    @JsonBackReference
-    private MenuCategory category;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id")
-    @JsonBackReference
-    private Store store;
+    private ObjectId categoryId;
 }
