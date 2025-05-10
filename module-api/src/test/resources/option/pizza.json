@@ -1,0 +1,56 @@
+[
+    {
+        "_id" : "681edb5be8f2f34d23ecf6b7",
+        "categoryName" : "토핑",
+        "multiple" : true,
+        "required" : false,
+        "maxSelect" : 0,
+        "options" : [
+            {
+                "optionId" : 1,
+                "optionName" : "치즈 추가",
+                "price" : 1000,
+                "image" : "",
+                "soldOut" : false,
+                "onlyOne" : false,
+                "tags" : ["BEST"]
+            },
+            {
+                "optionId" : 2,
+                "optionName" : "페퍼로니 추가",
+                "price" : 1000,
+                "image" : "",
+                "soldOut" : false,
+                "onlyOne" : false,
+                "tags" : []
+            }
+        ]
+    },
+    {
+        "_id" : "681edb5be8f2f34d23ecf6b8",
+        "categoryName" : "엣지",
+        "multiple" : false,
+        "required" : false,
+        "maxSelect" : 0,
+        "options" : [
+            {
+                "optionId" : 3,
+                "optionName" : "치즈 크러스트 변경",
+                "price" : 2500,
+                "image" : "",
+                "soldOut" : false,
+                "onlyOne" : true,
+                "tags" : ["BEST"]
+            },
+            {
+                "optionId" : 4,
+                "optionName" : "치즈 바이트 변경",
+                "price" : 3000,
+                "image" : "",
+                "soldOut" : false,
+                "onlyOne" : true,
+                "tags" : ["BEST"]
+            }
+        ]
+    }
+]

@@ -27,17 +27,43 @@ public class DataLoader {
 		return responseEntity.getBody();
 	}
 
-	public static Store getStoreInfo(String storeFile) {
-		InputStream inputStream = DataLoader.class.getResourceAsStream("/" + storeFile);
+	public static Store getStoreInfo(String fileName) {
+		InputStream inputStream = DataLoader.class.getResourceAsStream("/store/" + fileName);
 
 		Store store = null;
 		try {
-			StoreDTO storeDTO = objectMapper.readValue(inputStream, new TypeReference<>() {});
-			store = StoreMapper.INSTANCE.toEntity(storeDTO);
+			store = objectMapper.readValue(inputStream, Store.class);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 
 		return store;
+	}
+
+	public static List<Category> getCategoryList(String fileName) {
+		InputStream inputStream = DataLoader.class.getResourceAsStream("/category/" + fileName);
+
+		List<Category> categoryList = null;
+		try {
+			categoryList = objectMapper.readValue(inputStream, objectMapper.getTypeFactory().constructCollectionType(List.class, Category.class));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		return categoryList;
+	}
+
+	public static List<Menu> getMenuList(String fileName) {
+		InputStream inputStream = DataLoader.class.getResourceAsStream("/menu/" + fileName);
+
+		List<Menu> menuList = null;
+		try {
+			menuList = objectMapper.readValue(inputStream, objectMapper.getTypeFactory().constructCollectionType(List.class, Menu.class));
+
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		return menuList;
 	}
 }
