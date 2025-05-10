@@ -1,8 +1,9 @@
 package com.flab.tableorder.service;
 
 import com.flab.tableorder.domain.*;
+import com.flab.tableorder.exception.*;
 
-import jakarta.persistence.EntityNotFoundException;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -11,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class StoreServiceTest {
@@ -22,23 +23,27 @@ public class StoreServiceTest {
 
 	@Test
 	void getApiKey_NotFound() {
-		Assertions.assertThrows(EntityNotFoundException.class, () -> {
-			storeService.getStoreIdByApiKey("notfound");
-		});
+		String apiKey = "invalid";
+		when(storeRepository.findByApiKey(apiKey)).thenReturn(Optional.empty());
+
+		assertThatThrownBy(() -> storeService.getStoreIdByApiKey(apiKey))
+				.isInstanceOf(StoreNotFoundException.class);
 	}
 
 	@Test
 	void getApiKey_Success() {
 		String apiKey = "testapikey1";
-		Long mockStoreId = 1L;
+
+		String mockStoreId = "681ed78738e9f414e37cf709";
+		ObjectId objectId = new ObjectId(mockStoreId);
 
 		Store store = new Store();
-		store.setStoreId(mockStoreId);
+		store.setStoreId(objectId);
 		store.setApiKey(apiKey);
 
 		when(storeRepository.findByApiKey(apiKey)).thenReturn(Optional.of(store));
 
-		Long storeId = storeService.getStoreIdByApiKey(apiKey);
+		String storeId = storeService.getStoreIdByApiKey(apiKey);
 
 		assertThat(storeId).isEqualTo(mockStoreId);
 	}

@@ -10,6 +10,7 @@ import java.util.*;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +39,7 @@ public class ApiKeyInterceptorTest {
 	private StoreRepository storeRepository;
 
 	private String url;
-	private Long storeId = 1L;
+	private String storeId = "";
 	private String apiKey = "testAPI";
 
 	@BeforeAll
@@ -46,7 +47,7 @@ public class ApiKeyInterceptorTest {
 		this.url = "http://localhost:" + port + "/menu";
 
 		Store store = new Store();
-		store.setStoreId(this.storeId);
+		store.setStoreId(new ObjectId(this.storeId));
 		store.setApiKey(this.apiKey);
 
 		storeRepository.save(store);

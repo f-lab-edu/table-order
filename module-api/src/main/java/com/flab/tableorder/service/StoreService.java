@@ -1,8 +1,8 @@
 package com.flab.tableorder.service;
 
 import com.flab.tableorder.domain.*;
+import com.flab.tableorder.exception.StoreNotFoundException;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,12 +18,12 @@ public class StoreService {
 
 	@Transactional(readOnly = true)
 	@Cacheable(value = "storeCache", key = "#apiKey")
-	public Long getStoreIdByApiKey(String apiKey) {
+	public String getStoreIdByApiKey(String apiKey) {
 		log.info("캐시에 API Key가 존재하지 않음... DB Select");
 
 		Store store = storeRepository.findByApiKey(apiKey)
-				.orElseThrow(() -> new EntityNotFoundException("Api Key not found"));
+				.orElseThrow(() -> new StoreNotFoundException(apiKey));
 
-		return store.getStoreId();
+		return store.getStoreId().toString();
 	}
 }
