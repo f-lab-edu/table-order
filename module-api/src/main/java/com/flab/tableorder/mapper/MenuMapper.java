@@ -5,14 +5,17 @@ import com.flab.tableorder.dto.*;
 
 import java.util.*;
 
+import org.bson.types.ObjectId;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = ObjectIdMapper.class)
 public interface MenuMapper {
     MenuMapper INSTANCE = Mappers.getMapper(MenuMapper.class);
 
-    List<MenuCategoryDTO> toDTO(List<MenuCategory> menuCategories);
+    @Mapping(source = "menuId", target = "menuId")
+    List<MenuDTO> toDTO(List<Menu> menuList);
 
+    @Mapping(source = "menuId", target = "menuId")
     MenuDTO toDTO(Menu menu);
 }

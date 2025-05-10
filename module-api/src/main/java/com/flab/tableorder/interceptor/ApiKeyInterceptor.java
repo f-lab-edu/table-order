@@ -41,7 +41,7 @@ public class ApiKeyInterceptor implements HandlerInterceptor {
 		}
 
 		apiKey = apiKey.substring(apiKeyHeader.length());
-		Long storeId = storeService.getStoreIdByApiKey(apiKey);
+		String storeId = storeService.getStoreIdByApiKey(apiKey);
 
 		StoreContext.setStoreId(storeId);
 
