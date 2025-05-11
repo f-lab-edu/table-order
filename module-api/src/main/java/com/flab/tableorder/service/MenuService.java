@@ -29,14 +29,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 public class MenuService {
-    private final ObjectMapper objectMapper;
     private final CategoryRepository categoryRepository;
     private final MenuRepository menuRepository;
 
     @Transactional(readOnly = true)
     public List<MenuCategoryDTO> getAllMenu(String storeId) {
         List<Category> categoryList = categoryRepository.findAllByStoreId(storeId);
-        if (categoryList == null || categoryList.isEmpty()) return new ArrayList<>();
+        if (categoryList.isEmpty()) return new ArrayList<>();
 
         List<ObjectId> categoryIds = categoryList.stream()
                 .map(Category::getCategoryId)
@@ -44,7 +43,7 @@ public class MenuService {
 
         List<Menu> menuList = menuRepository.findAllByCategoryIdIn(categoryIds);
 
-        Map<String, List<Menu>> menuListMap = menuList == null
+        Map<String, List<Menu>> menuListMap = menuList.isEmpty()
                 ? new HashMap<>()
                 : menuList.stream()
                         .collect(Collectors.groupingBy(menu -> menu.getCategoryId().toString()));
@@ -52,8 +51,8 @@ public class MenuService {
         List<MenuCategoryDTO> result = CategoryMapper.INSTANCE.toDTO(categoryList);
 
         for (MenuCategoryDTO menuCategory : result) {
-            List<MenuDTO> menu = MenuMapper.INSTANCE.toDTO(menuListMap.get(menuCategory.getCategoryId()));
-            menu = menu == null ? new ArrayList<>() : menu;
+            List<Menu> menuEntity = menuListMap.get(menuCategory.getCategoryId());
+            List<MenuDTO> menu = menuEntity == null ? new ArrayList<>() : MenuMapper.INSTANCE.toDTO(menuEntity);
             menuCategory.setMenu(menu);
         }
 

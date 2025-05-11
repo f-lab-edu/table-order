@@ -12,6 +12,7 @@ import com.flab.tableorder.dto.MenuCategoryDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,13 +30,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class MenuServiceTest {
     @Mock
-    private StoreRepository storeRepository;
-    @Mock
     private MenuRepository menuRepository;
     @Mock
     private CategoryRepository categoryRepository;
-    @Mock
-    private ObjectMapper objectMapper;
 
     @InjectMocks
     private MenuService menuService;
@@ -45,10 +42,9 @@ public class MenuServiceTest {
         Store mockStore = DataLoader.getStoreInfo("pizza.json");
         ObjectId objectId = mockStore.getStoreId();
         String storeId = objectId.toString();
-        when(categoryRepository.findAllByStoreId(storeId)).thenReturn(null);
+        when(categoryRepository.findAllByStoreId(storeId)).thenReturn(new ArrayList<>());
 
         List<MenuCategoryDTO> allMenu = menuService.getAllMenu(storeId);
-        assertThat(allMenu).isNotNull();
         assertThat(allMenu).isEmpty();
     }
 
@@ -66,16 +62,14 @@ public class MenuServiceTest {
                 .collect(Collectors.toList());
 
         when(categoryRepository.findAllByStoreId(storeId)).thenReturn(categoryList);
-        when(menuRepository.findAllByCategoryIdIn(categoryIds)).thenReturn(null);
+        when(menuRepository.findAllByCategoryIdIn(categoryIds)).thenReturn(new ArrayList<>());
 
         List<MenuCategoryDTO> allMenu = menuService.getAllMenu(storeId);
 
         assertThat(allMenu).isNotEmpty();
-        assertThat(allMenu).isNotNull();
         assertThat(allMenu.size()).isEqualTo(categoryList.size());
 
         for (MenuCategoryDTO menuCategoryDTO : allMenu) {
-            assertThat(menuCategoryDTO.getMenu()).isNotNull();
             assertThat(menuCategoryDTO.getMenu()).isEmpty();
         }
     }
@@ -101,7 +95,6 @@ public class MenuServiceTest {
         List<MenuCategoryDTO> allMenu = menuService.getAllMenu(storeId);
 
         assertThat(allMenu).isNotEmpty();
-        assertThat(allMenu).isNotNull();
         assertThat(allMenu.size()).isEqualTo(categoryList.size());
 
         int menuCnt = 0;
