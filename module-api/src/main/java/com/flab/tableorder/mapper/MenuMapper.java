@@ -1,12 +1,13 @@
 package com.flab.tableorder.mapper;
 
-import com.flab.tableorder.domain.*;
-import com.flab.tableorder.dto.*;
+import com.flab.tableorder.domain.Menu;
+import com.flab.tableorder.dto.MenuDTO;
 
-import java.util.*;
+import java.util.List;
 
-import org.bson.types.ObjectId;
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = ObjectIdMapper.class)

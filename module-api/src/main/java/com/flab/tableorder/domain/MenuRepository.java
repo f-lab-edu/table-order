@@ -1,6 +1,7 @@
 package com.flab.tableorder.domain;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,10 +1,13 @@
 package com.flab.tableorder.config;
 
-import com.flab.tableorder.interceptor.*;
+import com.flab.tableorder.interceptor.ApiKeyInterceptor;
+import com.flab.tableorder.interceptor.ResquestInterceptor;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.*;
-import org.springframework.web.servlet.config.annotation.*;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @RequiredArgsConstructor

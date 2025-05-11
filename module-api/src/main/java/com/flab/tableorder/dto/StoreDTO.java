@@ -1,8 +1,10 @@
 package com.flab.tableorder.dto;
 
-import java.util.*;
+import java.util.List;
 
-import lombok.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter @Setter @Data
 public class StoreDTO {

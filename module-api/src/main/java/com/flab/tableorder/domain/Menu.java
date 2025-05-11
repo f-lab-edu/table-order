@@ -1,11 +1,12 @@
 package com.flab.tableorder.domain;
 
-import java.util.*;
+import java.util.List;
 
-import lombok.*;
-import jakarta.persistence.*;
+import jakarta.persistence.Id;
+import lombok.Getter;
+import lombok.Setter;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;

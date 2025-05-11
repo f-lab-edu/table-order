@@ -1,28 +1,28 @@
 package com.flab.tableorder.interceptor;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.flab.tableorder.DataLoader;
 import com.flab.tableorder.domain.Store;
 import com.flab.tableorder.domain.StoreRepository;
-import com.flab.tableorder.dto.*;
 
-import java.util.*;
+import java.util.Map;
 
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
+import org.bson.types.ObjectId;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

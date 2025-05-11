@@ -1,6 +1,7 @@
 package com.flab.tableorder.dto;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter @Setter
 public class ResponseDTO<T> {

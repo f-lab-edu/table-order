@@ -1,8 +1,6 @@
 package com.flab.tableorder.mapper;
 
 import org.bson.types.ObjectId;
-import org.mapstruct.Mapper;
-
 public class ObjectIdMapper {
 	String map(ObjectId value) {
 		if (value == null) {

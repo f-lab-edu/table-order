@@ -1,8 +1,9 @@
 package com.flab.tableorder.domain;
 
-import lombok.*;
-
 import java.util.List;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter @Setter
 public class Option {

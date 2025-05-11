@@ -1,10 +1,16 @@
 package com.flab.tableorder.controller;
 
-import com.flab.tableorder.dto.*;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import com.flab.tableorder.dto.MenuDTO;
+import com.flab.tableorder.dto.ResponseDTO;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController

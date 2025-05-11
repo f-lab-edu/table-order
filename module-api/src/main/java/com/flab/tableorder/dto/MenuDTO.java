@@ -1,10 +1,12 @@
 package com.flab.tableorder.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
-import lombok.*;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter @Setter @Data
 public class MenuDTO {

@@ -1,9 +1,10 @@
 package com.flab.tableorder.service;
 
-import com.flab.tableorder.domain.*;
+import com.flab.tableorder.domain.Store;
+import com.flab.tableorder.domain.StoreRepository;
 import com.flab.tableorder.exception.StoreNotFoundException;
 
-import lombok.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.cache.annotation.Cacheable;

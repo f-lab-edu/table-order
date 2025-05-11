@@ -2,10 +2,13 @@ package com.flab.tableorder.exception;
 
 import com.flab.tableorder.dto.ResponseDTO;
 
-import jakarta.persistence.*;
+import jakarta.persistence.EntityNotFoundException;
 
-import org.springframework.http.*;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

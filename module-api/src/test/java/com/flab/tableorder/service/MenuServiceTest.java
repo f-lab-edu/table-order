@@ -1,24 +1,30 @@
 package com.flab.tableorder.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.tableorder.DataLoader;
-import com.flab.tableorder.domain.*;
-import com.flab.tableorder.dto.*;
-import com.flab.tableorder.exception.*;
+import com.flab.tableorder.domain.Category;
+import com.flab.tableorder.domain.CategoryRepository;
+import com.flab.tableorder.domain.Menu;
+import com.flab.tableorder.domain.MenuRepository;
+import com.flab.tableorder.domain.Store;
+import com.flab.tableorder.domain.StoreRepository;
+import com.flab.tableorder.dto.MenuCategoryDTO;
 
-import java.io.*;
-import java.util.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.util.List;
 import java.util.stream.Collectors;
 
-import com.flab.tableorder.mapper.ObjectIdMapper;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class MenuServiceTest {
@@ -76,7 +82,7 @@ public class MenuServiceTest {
 	}
 
 	@Test
-	void getAllMenu_NotEmpty() throws IOException {
+	void getAllMenu_NotEmpty() {
 		String fileName = "pizza.json";
 
 		Store mockStore = DataLoader.getStoreInfo(fileName);

@@ -1,21 +1,20 @@
 package com.flab.tableorder.interceptor;
 
 import com.flab.tableorder.context.StoreContext;
-import com.flab.tableorder.domain.*;
-import com.flab.tableorder.dto.*;
-
-import java.io.*;
-import java.util.*;
-
+import com.flab.tableorder.dto.ResponseDTO;
 import com.flab.tableorder.service.StoreService;
-import jakarta.servlet.http.*;
-import lombok.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.springframework.http.*;
-import org.springframework.stereotype.*;
-import org.springframework.web.servlet.*;
+import java.io.IOException;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
 @RequiredArgsConstructor

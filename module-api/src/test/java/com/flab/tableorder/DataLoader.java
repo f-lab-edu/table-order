@@ -1,14 +1,16 @@
 package com.flab.tableorder;
 
-import com.flab.tableorder.domain.*;
-import com.flab.tableorder.dto.*;
-import com.flab.tableorder.mapper.*;
+import com.flab.tableorder.domain.Category;
+import com.flab.tableorder.domain.Menu;
+import com.flab.tableorder.domain.Store;
 
-import java.io.*;
-import java.util.*;
-
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
