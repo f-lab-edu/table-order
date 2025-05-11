@@ -22,10 +22,10 @@ public class DataLoader {
 
     public static Map<String, Object> getResponseData(TestRestTemplate restTemplate, String url, HttpMethod httpMethod, HttpEntity httpEntity) {
         ResponseEntity<Map<String, Object>> responseEntity = restTemplate.exchange(
-                url,
-                httpMethod,
-                httpEntity,
-                new ParameterizedTypeReference<Map<String, Object>>() {}
+            url,
+            httpMethod,
+            httpEntity,
+            new ParameterizedTypeReference<Map<String, Object>>() {}
         );
         return responseEntity.getBody();
     }
@@ -48,7 +48,9 @@ public class DataLoader {
 
         List<Category> categoryList = null;
         try {
-            categoryList = objectMapper.readValue(inputStream, objectMapper.getTypeFactory().constructCollectionType(List.class, Category.class));
+            categoryList = objectMapper.readValue(inputStream, objectMapper.getTypeFactory()
+                .constructCollectionType(List.class, Category.class)
+            );
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -61,7 +63,9 @@ public class DataLoader {
 
         List<Menu> menuList = null;
         try {
-            menuList = objectMapper.readValue(inputStream, objectMapper.getTypeFactory().constructCollectionType(List.class, Menu.class));
+            menuList = objectMapper.readValue(inputStream, objectMapper.getTypeFactory()
+                .constructCollectionType(List.class, Menu.class)
+            );
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

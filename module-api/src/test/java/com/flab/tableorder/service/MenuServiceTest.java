@@ -42,6 +42,7 @@ public class MenuServiceTest {
         Store mockStore = DataLoader.getStoreInfo("pizza.json");
         ObjectId objectId = mockStore.getStoreId();
         String storeId = objectId.toString();
+
         when(categoryRepository.findAllByStoreId(storeId)).thenReturn(new ArrayList<>());
 
         List<MenuCategoryDTO> allMenu = menuService.getAllMenu(storeId);
@@ -58,8 +59,8 @@ public class MenuServiceTest {
 
         List<Category> categoryList = DataLoader.getCategoryList(fileName);
         List<ObjectId> categoryIds = categoryList.stream()
-                .map(Category::getCategoryId)
-                .collect(Collectors.toList());
+            .map(Category::getCategoryId)
+            .collect(Collectors.toList());
 
         when(categoryRepository.findAllByStoreId(storeId)).thenReturn(categoryList);
         when(menuRepository.findAllByCategoryIdIn(categoryIds)).thenReturn(new ArrayList<>());
@@ -84,8 +85,8 @@ public class MenuServiceTest {
 
         List<Category> categoryList = DataLoader.getCategoryList(fileName);
         List<ObjectId> categoryIds = categoryList.stream()
-                .map(Category::getCategoryId)
-                .collect(Collectors.toList());
+            .map(Category::getCategoryId)
+            .collect(Collectors.toList());
 
         List<Menu> menuList = DataLoader.getMenuList(fileName);
 

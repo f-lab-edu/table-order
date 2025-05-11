@@ -55,8 +55,7 @@ public class MenuController {
         call3.setCallId(3);
         call3.setCallName("호출");
 
-        ResponseDTO<List<CallDTO>> responseData
-                = new ResponseDTO<>(200, "", List.of(call1, call2, call3));
+        ResponseDTO<List<CallDTO>> responseData = new ResponseDTO<>(200, "", List.of(call1, call2, call3));
 
         return ResponseEntity.ok(responseData);
     }

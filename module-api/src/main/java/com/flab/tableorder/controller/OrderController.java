@@ -18,16 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderController {
     @PostMapping("/table/{tableId}")
     public ResponseEntity<ResponseDTO<Map<String, List<MenuDTO>>>> postOrder(@RequestBody Map<String, List<MenuDTO>> requestData) {
-        ResponseDTO<Map<String, List<MenuDTO>>> responseData
-                = new ResponseDTO<>(200, "");
+        ResponseDTO<Map<String, List<MenuDTO>>> responseData = new ResponseDTO<>(200, "");
 
         return ResponseEntity.ok(responseData);
     }
 
     @PostMapping("/table/{tableId}/call")
     public ResponseEntity<ResponseDTO<Map<String, List<Long>>>> postCall(@RequestBody Map<String, List<Long>> requestData) {
-        ResponseDTO<Map<String, List<Long>>> responseData
-                = new ResponseDTO<>(200, "");
+        ResponseDTO<Map<String, List<Long>>> responseData = new ResponseDTO<>(200, "");
 
         return ResponseEntity.ok(responseData);
     }
