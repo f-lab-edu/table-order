@@ -59,7 +59,7 @@ public class MenuServiceTest {
 
         List<Category> categoryList = DataLoader.getCategoryList(fileName);
         List<ObjectId> categoryIds = categoryList.stream()
-            .map(Category::getCategoryId)
+            .map(category -> category.getCategoryId())
             .collect(Collectors.toList());
 
         when(categoryRepository.findAllByStoreId(storeId)).thenReturn(categoryList);
@@ -85,7 +85,7 @@ public class MenuServiceTest {
 
         List<Category> categoryList = DataLoader.getCategoryList(fileName);
         List<ObjectId> categoryIds = categoryList.stream()
-            .map(Category::getCategoryId)
+            .map(category -> category.getCategoryId())
             .collect(Collectors.toList());
 
         List<Menu> menuList = DataLoader.getMenuList(fileName);

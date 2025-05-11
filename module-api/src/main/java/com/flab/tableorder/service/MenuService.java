@@ -38,7 +38,7 @@ public class MenuService {
         if (categoryList.isEmpty()) return new ArrayList<>();
 
         List<ObjectId> categoryIds = categoryList.stream()
-            .map(Category::getCategoryId)
+            .map(category -> category.getCategoryId())
             .collect(Collectors.toList());
 
         List<Menu> menuList = menuRepository.findAllByCategoryIdIn(categoryIds);
@@ -61,9 +61,8 @@ public class MenuService {
 
     @Transactional(readOnly = true)
     public MenuDTO getMenu(String storeId, String menuId) {
-        Menu menu = menuRepository.findByMenuIdAndStore_StoreId(storeId, menuId)
+        return menuRepository.findByMenuIdAndStore_StoreId(storeId, menuId)
+            .map(menu -> MenuMapper.INSTANCE.toDTO(menu))
             .orElseThrow(() -> new EntityNotFoundException("Menu not found"));
-
-        return MenuMapper.INSTANCE.toDTO(menu);
     }
 }
