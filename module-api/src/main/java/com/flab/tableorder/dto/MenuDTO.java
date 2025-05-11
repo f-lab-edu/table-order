@@ -10,17 +10,17 @@ import lombok.Setter;
 
 @Getter @Setter @Data
 public class MenuDTO {
-	private String menuId = "";
-	private String menuName = "";
-	private String description = "";
-	private int quantity = 0;
-	private int price = 0;
-	private int salePrice = 0;
-	private String image = "";
-	@JsonProperty("isSoldOut")
-	private boolean soldOut = false;
-	@JsonProperty("isOptionEnabled")
-	private boolean optionEnabled = false;
-	private List<String> tags;
-	private List<OptionCategoryDTO> options;
+    private String menuId = "";
+    private String menuName = "";
+    private String description = "";
+    private int quantity = 0;
+    private int price = 0;
+    private int salePrice = 0;
+    private String image = "";
+    @JsonProperty("isSoldOut")
+    private boolean soldOut = false;
+    @JsonProperty("isOptionEnabled")
+    private boolean optionEnabled = false;
+    private List<String> tags;
+    private List<OptionCategoryDTO> options;
 }

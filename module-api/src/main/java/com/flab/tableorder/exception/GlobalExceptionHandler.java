@@ -9,13 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-	@ExceptionHandler(EntityNotFoundException.class)
-	public ResponseEntity<ResponseDTO> handleEntityNotFound(EntityNotFoundException ex) {
-		ResponseDTO responseData = new ResponseDTO(404, ex.getMessage());
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ResponseDTO> handleEntityNotFound(EntityNotFoundException ex) {
+        ResponseDTO responseData = new ResponseDTO(404, ex.getMessage());
 
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
-	}
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
+    }
 }

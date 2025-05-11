@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StoreRepository extends MongoRepository<Store, Long> {
-	Optional<Store> findByApiKey(String apiKey);
+    Optional<Store> findByApiKey(String apiKey);
 }

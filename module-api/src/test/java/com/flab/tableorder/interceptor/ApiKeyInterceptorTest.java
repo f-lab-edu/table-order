@@ -31,57 +31,57 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ApiKeyInterceptorTest {
-	@LocalServerPort
-	private int port;
-	@Autowired
-	private TestRestTemplate restTemplate;
-	@Autowired
-	private StoreRepository storeRepository;
+    @LocalServerPort
+    private int port;
+    @Autowired
+    private TestRestTemplate restTemplate;
+    @Autowired
+    private StoreRepository storeRepository;
 
-	private String url;
-	private String storeId = "";
-	private String apiKey = "testAPI";
+    private String url;
+    private String storeId = "";
+    private String apiKey = "testAPI";
 
-	@BeforeAll
-	void init() {
-		this.url = "http://localhost:" + port + "/menu";
+    @BeforeAll
+    void init() {
+        this.url = "http://localhost:" + port + "/menu";
 
-		Store store = new Store();
-		store.setStoreId(new ObjectId(this.storeId));
-		store.setApiKey(this.apiKey);
+        Store store = new Store();
+        store.setStoreId(new ObjectId(this.storeId));
+        store.setApiKey(this.apiKey);
 
-		storeRepository.save(store);
-	}
+        storeRepository.save(store);
+    }
 
-	@Test
-	void APIKey_NoAuthorization() {
-		Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, null);
-		assertThat(responseData.get("code")).isEqualTo(HttpStatus.UNAUTHORIZED.value());
-	}
+    @Test
+    void APIKey_NoAuthorization() {
+        Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, null);
+        assertThat(responseData.get("code")).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+    }
 
-	@Test
-	void APIKey_NotFound() {
-		HttpHeaders headers = new HttpHeaders();
-		headers.set("Authorization", "Bearer notfound");
+    @Test
+    void APIKey_NotFound() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer notfound");
 
-		HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
+        HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
 
-		Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, httpEntity);
-		assertThat(responseData.get("code")).isEqualTo(HttpStatus.NOT_FOUND.value());
-		assertThat(responseData.get("message")).isEqualTo("Api Key not found");
-	}
+        Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, httpEntity);
+        assertThat(responseData.get("code")).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(responseData.get("message")).isEqualTo("Api Key not found");
+    }
 
-	@Test
-	void APIKeyCache_Success() {
-		HttpHeaders headers = new HttpHeaders();
-		headers.set("Authorization", "Bearer " + this.apiKey);
+    @Test
+    void APIKeyCache_Success() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + this.apiKey);
 
-		HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
+        HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
 
-		Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, httpEntity);
-		assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
+        Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, httpEntity);
+        assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
 
-		responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, httpEntity);
-		assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
-	}
+        responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, httpEntity);
+        assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
+    }
 }

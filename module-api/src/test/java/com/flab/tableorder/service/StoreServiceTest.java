@@ -16,35 +16,35 @@ import static org.assertj.core.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class StoreServiceTest {
-	@Mock
-	private StoreRepository storeRepository;
-	@InjectMocks
-	private StoreService storeService;
+    @Mock
+    private StoreRepository storeRepository;
+    @InjectMocks
+    private StoreService storeService;
 
-	@Test
-	void getApiKey_NotFound() {
-		String apiKey = "invalid";
-		when(storeRepository.findByApiKey(apiKey)).thenReturn(Optional.empty());
+    @Test
+    void getApiKey_NotFound() {
+        String apiKey = "invalid";
+        when(storeRepository.findByApiKey(apiKey)).thenReturn(Optional.empty());
 
-		assertThatThrownBy(() -> storeService.getStoreIdByApiKey(apiKey))
-				.isInstanceOf(StoreNotFoundException.class);
-	}
+        assertThatThrownBy(() -> storeService.getStoreIdByApiKey(apiKey))
+                .isInstanceOf(StoreNotFoundException.class);
+    }
 
-	@Test
-	void getApiKey_Success() {
-		String apiKey = "testapikey1";
+    @Test
+    void getApiKey_Success() {
+        String apiKey = "testapikey1";
 
-		String mockStoreId = "681ed78738e9f414e37cf709";
-		ObjectId objectId = new ObjectId(mockStoreId);
+        String mockStoreId = "681ed78738e9f414e37cf709";
+        ObjectId objectId = new ObjectId(mockStoreId);
 
-		Store store = new Store();
-		store.setStoreId(objectId);
-		store.setApiKey(apiKey);
+        Store store = new Store();
+        store.setStoreId(objectId);
+        store.setApiKey(apiKey);
 
-		when(storeRepository.findByApiKey(apiKey)).thenReturn(Optional.of(store));
+        when(storeRepository.findByApiKey(apiKey)).thenReturn(Optional.of(store));
 
-		String storeId = storeService.getStoreIdByApiKey(apiKey);
+        String storeId = storeService.getStoreIdByApiKey(apiKey);
 
-		assertThat(storeId).isEqualTo(mockStoreId);
-	}
+        assertThat(storeId).isEqualTo(mockStoreId);
+    }
 }

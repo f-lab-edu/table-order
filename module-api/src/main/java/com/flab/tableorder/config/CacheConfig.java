@@ -11,6 +11,6 @@ import org.springframework.context.annotation.Configuration;
 public class CacheConfig {
     @Bean
     public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager("storeCache");  // "storeCache"는 캐시 이름
+        return new ConcurrentMapCacheManager("storeCache");
     }
 }

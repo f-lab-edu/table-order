@@ -8,8 +8,8 @@ import lombok.Setter;
 
 @Getter @Setter @Data
 public class StoreDTO {
-	private String storeId = "";
-	private String apiKey = "";
+    private String storeId = "";
+    private String apiKey = "";
 
-	private List<MenuCategoryDTO> categories;
+    private List<MenuCategoryDTO> categories;
 }

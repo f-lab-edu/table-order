@@ -28,114 +28,112 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class MenuServiceTest {
-	@Mock
-	private StoreRepository storeRepository;
-	@Mock
-	private MenuRepository menuRepository;
-	@Mock
-	private CategoryRepository categoryRepository;
-	@Mock
-	private ObjectMapper objectMapper;
+    @Mock
+    private StoreRepository storeRepository;
+    @Mock
+    private MenuRepository menuRepository;
+    @Mock
+    private CategoryRepository categoryRepository;
+    @Mock
+    private ObjectMapper objectMapper;
 
-	@InjectMocks
-	private MenuService menuService;
-	
-	@Test
-	void getAllMenu_Empty_Category() {
-		Store mockStore = DataLoader.getStoreInfo("pizza.json");
-		ObjectId objectId = mockStore.getStoreId();
-		String storeId = objectId.toString();
-		when(categoryRepository.findAllByStoreId(storeId)).thenReturn(null);
+    @InjectMocks
+    private MenuService menuService;
 
-		List<MenuCategoryDTO> allMenu = menuService.getAllMenu(storeId);
-		assertThat(allMenu).isNotNull();
-		assertThat(allMenu).isEmpty();
-	}
+    @Test
+    void getAllMenu_Empty_Category() {
+        Store mockStore = DataLoader.getStoreInfo("pizza.json");
+        ObjectId objectId = mockStore.getStoreId();
+        String storeId = objectId.toString();
+        when(categoryRepository.findAllByStoreId(storeId)).thenReturn(null);
 
-	@Test
-	void getAllMenu_Empty_Menu() {
-		String fileName = "pizza.json";
+        List<MenuCategoryDTO> allMenu = menuService.getAllMenu(storeId);
+        assertThat(allMenu).isNotNull();
+        assertThat(allMenu).isEmpty();
+    }
 
-		Store mockStore = DataLoader.getStoreInfo(fileName);
-		ObjectId objectId = mockStore.getStoreId();
-		String storeId = objectId.toString();
+    @Test
+    void getAllMenu_Empty_Menu() {
+        String fileName = "pizza.json";
 
+        Store mockStore = DataLoader.getStoreInfo(fileName);
+        ObjectId objectId = mockStore.getStoreId();
+        String storeId = objectId.toString();
 
-		List<Category> categoryList = DataLoader.getCategoryList(fileName);
-		List<ObjectId> categoryIds = categoryList.stream()
-						.map(Category::getCategoryId)
-						.collect(Collectors.toList());
+        List<Category> categoryList = DataLoader.getCategoryList(fileName);
+        List<ObjectId> categoryIds = categoryList.stream()
+                .map(Category::getCategoryId)
+                .collect(Collectors.toList());
 
-		when(categoryRepository.findAllByStoreId(storeId)).thenReturn(categoryList);
-		when(menuRepository.findAllByCategoryIdIn(categoryIds)).thenReturn(null);
+        when(categoryRepository.findAllByStoreId(storeId)).thenReturn(categoryList);
+        when(menuRepository.findAllByCategoryIdIn(categoryIds)).thenReturn(null);
 
-		List<MenuCategoryDTO> allMenu = menuService.getAllMenu(storeId);
+        List<MenuCategoryDTO> allMenu = menuService.getAllMenu(storeId);
 
-		assertThat(allMenu).isNotEmpty();
-		assertThat(allMenu).isNotNull();
-		assertThat(allMenu.size()).isEqualTo(categoryList.size());
+        assertThat(allMenu).isNotEmpty();
+        assertThat(allMenu).isNotNull();
+        assertThat(allMenu.size()).isEqualTo(categoryList.size());
 
-		for (MenuCategoryDTO menuCategoryDTO: allMenu) {
-			assertThat(menuCategoryDTO.getMenu()).isNotNull();
-			assertThat(menuCategoryDTO.getMenu()).isEmpty();
-		}
-	}
+        for (MenuCategoryDTO menuCategoryDTO : allMenu) {
+            assertThat(menuCategoryDTO.getMenu()).isNotNull();
+            assertThat(menuCategoryDTO.getMenu()).isEmpty();
+        }
+    }
 
-	@Test
-	void getAllMenu_NotEmpty() {
-		String fileName = "pizza.json";
+    @Test
+    void getAllMenu_NotEmpty() {
+        String fileName = "pizza.json";
 
-		Store mockStore = DataLoader.getStoreInfo(fileName);
-		ObjectId objectId = mockStore.getStoreId();
-		String storeId = objectId.toString();
+        Store mockStore = DataLoader.getStoreInfo(fileName);
+        ObjectId objectId = mockStore.getStoreId();
+        String storeId = objectId.toString();
 
+        List<Category> categoryList = DataLoader.getCategoryList(fileName);
+        List<ObjectId> categoryIds = categoryList.stream()
+                .map(Category::getCategoryId)
+                .collect(Collectors.toList());
 
-		List<Category> categoryList = DataLoader.getCategoryList(fileName);
-		List<ObjectId> categoryIds = categoryList.stream()
-				.map(Category::getCategoryId)
-				.collect(Collectors.toList());
+        List<Menu> menuList = DataLoader.getMenuList(fileName);
 
-		List<Menu> menuList = DataLoader.getMenuList(fileName);
+        when(categoryRepository.findAllByStoreId(storeId)).thenReturn(categoryList);
+        when(menuRepository.findAllByCategoryIdIn(categoryIds)).thenReturn(menuList);
 
-		when(categoryRepository.findAllByStoreId(storeId)).thenReturn(categoryList);
-		when(menuRepository.findAllByCategoryIdIn(categoryIds)).thenReturn(menuList);
+        List<MenuCategoryDTO> allMenu = menuService.getAllMenu(storeId);
 
-		List<MenuCategoryDTO> allMenu = menuService.getAllMenu(storeId);
+        assertThat(allMenu).isNotEmpty();
+        assertThat(allMenu).isNotNull();
+        assertThat(allMenu.size()).isEqualTo(categoryList.size());
 
-		assertThat(allMenu).isNotEmpty();
-		assertThat(allMenu).isNotNull();
-		assertThat(allMenu.size()).isEqualTo(categoryList.size());
+        int menuCnt = 0;
+        for (MenuCategoryDTO menuCategoryDTO : allMenu) {
+            assertThat(menuCategoryDTO.getMenu()).isNotEmpty();
+            menuCnt += menuCategoryDTO.getMenu().size();
+        }
+        assertThat(menuList.size()).isEqualTo(menuCnt);
+    }
 
-		int menuCnt = 0;
-		for (MenuCategoryDTO menuCategoryDTO: allMenu) {
-			assertThat(menuCategoryDTO.getMenu()).isNotEmpty();
-			menuCnt += menuCategoryDTO.getMenu().size();
-		}
-		assertThat(menuList.size()).isEqualTo(menuCnt);
-	}
+    @Test
+    void getMenu_NotFound() throws IOException {
+        // Assertions.assertThrows(EntityNotFoundException.class, () -> {
+        // menuService.getMenu(0L);
+        // });
+    }
 
-	@Test
-	void getMenu_NotFound() throws IOException {
-//		Assertions.assertThrows(EntityNotFoundException.class, () -> {
-//			menuService.getMenu(0L);
-//		});
-	}
-
-	@Test
-	void getMenu_Success() throws IOException {
-//		Store mockStore = DataLoader.getStoreInfo("store.json");
-//		Long storeId = mockStore.getStoreId();
-//		StoreContext.setStoreId(storeId);
-//
-//		Menu mockMenu = mockStore.getCategories().get(0).getMenu().get(0);
-//		Long menuId = mockMenu.getMenuId();
-//
-//		when(menuRepository.findByMenuIdAndStore_StoreId(storeId, menuId)).thenReturn(Optional.of(mockMenu));
-//
-//		MenuDTO menu = menuService.getMenu(menuId);
-//
-//		assertThat(menu).isNotNull();
-//		assertThat(menu).isEqualTo(MenuMapper.INSTANCE.toDTO(mockMenu));
-	}
+    @Test
+    void getMenu_Success() throws IOException {
+        // Store mockStore = DataLoader.getStoreInfo("store.json");
+        // Long storeId = mockStore.getStoreId();
+        // StoreContext.setStoreId(storeId);
+        //
+        // Menu mockMenu = mockStore.getCategories().get(0).getMenu().get(0);
+        // Long menuId = mockMenu.getMenuId();
+        //
+        // when(menuRepository.findByMenuIdAndStore_StoreId(storeId, menuId)).thenReturn(Optional.of(mockMenu));
+        //
+        // MenuDTO menu = menuService.getMenu(menuId);
+        //
+        // assertThat(menu).isNotNull();
+        // assertThat(menu).isEqualTo(MenuMapper.INSTANCE.toDTO(mockMenu));
+    }
 
 }

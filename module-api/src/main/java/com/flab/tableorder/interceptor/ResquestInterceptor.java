@@ -1,42 +1,23 @@
 package com.flab.tableorder.interceptor;
 
-import com.flab.tableorder.context.StoreContext;
-import com.flab.tableorder.service.StoreService;
-
-import java.io.IOException;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class ResquestInterceptor implements HandlerInterceptor {
-	private final ObjectMapper objectMapper;
-	private final StoreService storeService;
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        String method = request.getMethod();
+        String uri = request.getRequestURI();
+        String query = request.getQueryString();
 
-	@Override
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
-		HttpServletRequest req = (HttpServletRequest) request;
+        log.info("HTTP Request - Method: {}, Path: {}, Query: {}", method, uri, query != null ? query : "");
 
-		String method = req.getMethod();
-		String uri = req.getRequestURI();
-		String query = req.getQueryString();
-
-		log.info("HTTP Request - Method: {}, Path: {}, Query: {}", method, uri, query != null ? query : "");
-
-		return true;
-	}
-
-	@Override
-	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-		StoreContext.clear();
-	}
+        return true;
+    }
 }

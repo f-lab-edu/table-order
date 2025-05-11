@@ -7,5 +7,5 @@ import lombok.Setter;
 
 @Getter @Setter
 public class OptionCategoryDTO extends CategoryDTO {
-	private List<OptionDTO> options;
+    private List<OptionDTO> options;
 }

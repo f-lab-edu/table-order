@@ -18,54 +18,54 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
 public class DataLoader {
-	private static ObjectMapper objectMapper = new ObjectMapper();
-	public static Map<String, Object> getResponseData(TestRestTemplate restTemplate, String url, HttpMethod httpMethod, HttpEntity httpEntity) {
-		ResponseEntity<Map<String, Object>> responseEntity = restTemplate.exchange(
-					url,
-					httpMethod,
-					httpEntity,
-					new ParameterizedTypeReference<Map<String, Object>>() {}
-				);
-		return responseEntity.getBody();
-	}
+    private static ObjectMapper objectMapper = new ObjectMapper();
 
-	public static Store getStoreInfo(String fileName) {
-		InputStream inputStream = DataLoader.class.getResourceAsStream("/store/" + fileName);
+    public static Map<String, Object> getResponseData(TestRestTemplate restTemplate, String url, HttpMethod httpMethod, HttpEntity httpEntity) {
+        ResponseEntity<Map<String, Object>> responseEntity = restTemplate.exchange(
+                url,
+                httpMethod,
+                httpEntity,
+                new ParameterizedTypeReference<Map<String, Object>>() {}
+        );
+        return responseEntity.getBody();
+    }
 
-		Store store = null;
-		try {
-			store = objectMapper.readValue(inputStream, Store.class);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+    public static Store getStoreInfo(String fileName) {
+        InputStream inputStream = DataLoader.class.getResourceAsStream("/store/" + fileName);
 
-		return store;
-	}
+        Store store = null;
+        try {
+            store = objectMapper.readValue(inputStream, Store.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-	public static List<Category> getCategoryList(String fileName) {
-		InputStream inputStream = DataLoader.class.getResourceAsStream("/category/" + fileName);
+        return store;
+    }
 
-		List<Category> categoryList = null;
-		try {
-			categoryList = objectMapper.readValue(inputStream, objectMapper.getTypeFactory().constructCollectionType(List.class, Category.class));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+    public static List<Category> getCategoryList(String fileName) {
+        InputStream inputStream = DataLoader.class.getResourceAsStream("/category/" + fileName);
 
-		return categoryList;
-	}
+        List<Category> categoryList = null;
+        try {
+            categoryList = objectMapper.readValue(inputStream, objectMapper.getTypeFactory().constructCollectionType(List.class, Category.class));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-	public static List<Menu> getMenuList(String fileName) {
-		InputStream inputStream = DataLoader.class.getResourceAsStream("/menu/" + fileName);
+        return categoryList;
+    }
 
-		List<Menu> menuList = null;
-		try {
-			menuList = objectMapper.readValue(inputStream, objectMapper.getTypeFactory().constructCollectionType(List.class, Menu.class));
+    public static List<Menu> getMenuList(String fileName) {
+        InputStream inputStream = DataLoader.class.getResourceAsStream("/menu/" + fileName);
 
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+        List<Menu> menuList = null;
+        try {
+            menuList = objectMapper.readValue(inputStream, objectMapper.getTypeFactory().constructCollectionType(List.class, Menu.class));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-		return menuList;
-	}
+        return menuList;
+    }
 }

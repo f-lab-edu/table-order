@@ -14,13 +14,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "option")
 @Getter @Setter
 public class OptionCategory {
-	@Id @JsonProperty("_id")
-	private ObjectId categoryId;
+    @Id @JsonProperty("_id")
+    private ObjectId categoryId;
 
-	private String categoryName;
-	private boolean multiple;
-	private boolean required;
-	private int maxSelect;
+    private String categoryName;
+    private boolean multiple;
+    private boolean required;
+    private int maxSelect;
 
-	private List<Option> options;
+    private List<Option> options;
 }

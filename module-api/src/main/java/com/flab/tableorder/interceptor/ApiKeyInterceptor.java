@@ -19,36 +19,36 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 @RequiredArgsConstructor
 public class ApiKeyInterceptor implements HandlerInterceptor {
-	private final ObjectMapper objectMapper;
-	private final StoreService storeService;
+    private final ObjectMapper objectMapper;
+    private final StoreService storeService;
 
-	@Override
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
-		String apiKeyHeader = "Bearer ";
-		int httpStatus;
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
+        String apiKeyHeader = "Bearer ";
+        int httpStatus;
 
-		String apiKey = request.getHeader("Authorization");
-		if (apiKey == null || !apiKey.startsWith(apiKeyHeader)) {
-			httpStatus = HttpStatus.UNAUTHORIZED.value();
-			ResponseDTO responseData = new ResponseDTO<>(httpStatus, "Invalid API Key");
+        String apiKey = request.getHeader("Authorization");
+        if (apiKey == null || !apiKey.startsWith(apiKeyHeader)) {
+            httpStatus = HttpStatus.UNAUTHORIZED.value();
+            ResponseDTO responseData = new ResponseDTO<>(httpStatus, "Invalid API Key");
 
-			response.setStatus(httpStatus);
-			response.setContentType("application/json");
-			response.getWriter().write(objectMapper.writeValueAsString(responseData));
+            response.setStatus(httpStatus);
+            response.setContentType("application/json");
+            response.getWriter().write(objectMapper.writeValueAsString(responseData));
 
-			return false;
-		}
+            return false;
+        }
 
-		apiKey = apiKey.substring(apiKeyHeader.length());
-		String storeId = storeService.getStoreIdByApiKey(apiKey);
+        apiKey = apiKey.substring(apiKeyHeader.length());
+        String storeId = storeService.getStoreIdByApiKey(apiKey);
 
-		StoreContext.setStoreId(storeId);
+        StoreContext.setStoreId(storeId);
 
-		return true;
-	}
+        return true;
+    }
 
-	@Override
-	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-		StoreContext.clear();
-	}
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+        StoreContext.clear();
+    }
 }
