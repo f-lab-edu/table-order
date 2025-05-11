@@ -2,6 +2,7 @@ package com.flab.tableorder;
 
 import com.flab.tableorder.domain.Category;
 import com.flab.tableorder.domain.Menu;
+import com.flab.tableorder.domain.OptionCategory;
 import com.flab.tableorder.domain.Store;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,33 +44,29 @@ public class DataLoader {
         return store;
     }
 
-    public static List<Category> getCategoryList(String fileName) {
-        InputStream inputStream = DataLoader.class.getResourceAsStream("/category/" + fileName);
+    public static List getListFromStream(String dir, String fileName, Class cls) {
+        InputStream inputStream = DataLoader.class.getResourceAsStream("/" + dir + "/" + fileName);
 
-        List<Category> categoryList = null;
+        List list = null;
         try {
-            categoryList = objectMapper.readValue(inputStream, objectMapper.getTypeFactory()
-                .constructCollectionType(List.class, Category.class)
+            list = objectMapper.readValue(inputStream, objectMapper.getTypeFactory()
+                .constructCollectionType(List.class, cls)
             );
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        return list;
+    }
 
-        return categoryList;
+    public static List<Category> getCategoryList(String fileName) {
+        return getListFromStream("category", fileName, Category.class);
     }
 
     public static List<Menu> getMenuList(String fileName) {
-        InputStream inputStream = DataLoader.class.getResourceAsStream("/menu/" + fileName);
+        return getListFromStream("menu", fileName, Menu.class);
+    }
 
-        List<Menu> menuList = null;
-        try {
-            menuList = objectMapper.readValue(inputStream, objectMapper.getTypeFactory()
-                .constructCollectionType(List.class, Menu.class)
-            );
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return menuList;
+    public static List<OptionCategory> getOptionList(String fileName) {
+        return getListFromStream("option", fileName, OptionCategory.class);
     }
 }
