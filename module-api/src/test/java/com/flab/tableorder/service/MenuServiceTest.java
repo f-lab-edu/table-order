@@ -6,16 +6,18 @@ import com.flab.tableorder.domain.CategoryRepository;
 import com.flab.tableorder.domain.Menu;
 import com.flab.tableorder.domain.MenuRepository;
 import com.flab.tableorder.domain.Store;
-import com.flab.tableorder.domain.StoreRepository;
 import com.flab.tableorder.dto.MenuCategoryDTO;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.flab.tableorder.dto.MenuDTO;
+import com.flab.tableorder.exception.MenuNotFoundException;
+import com.flab.tableorder.exception.StoreNotFoundException;
+import com.flab.tableorder.mapper.MenuMapper;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,6 +27,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,7 +47,7 @@ public class MenuServiceTest {
         ObjectId objectId = mockStore.getStoreId();
         String storeId = objectId.toString();
 
-        when(categoryRepository.findAllByStoreId(storeId)).thenReturn(new ArrayList<>());
+        when(categoryRepository.findAllByStoreId(objectId)).thenReturn(new ArrayList<>());
 
         List<MenuCategoryDTO> allMenu = menuService.getAllMenu(storeId);
         assertThat(allMenu).isEmpty();
@@ -62,7 +66,7 @@ public class MenuServiceTest {
             .map(category -> category.getCategoryId())
             .collect(Collectors.toList());
 
-        when(categoryRepository.findAllByStoreId(storeId)).thenReturn(categoryList);
+        when(categoryRepository.findAllByStoreId(objectId)).thenReturn(categoryList);
         when(menuRepository.findAllByCategoryIdIn(categoryIds)).thenReturn(new ArrayList<>());
 
         List<MenuCategoryDTO> allMenu = menuService.getAllMenu(storeId);
@@ -90,7 +94,7 @@ public class MenuServiceTest {
 
         List<Menu> menuList = DataLoader.getMenuList(fileName);
 
-        when(categoryRepository.findAllByStoreId(storeId)).thenReturn(categoryList);
+        when(categoryRepository.findAllByStoreId(objectId)).thenReturn(categoryList);
         when(menuRepository.findAllByCategoryIdIn(categoryIds)).thenReturn(menuList);
 
         List<MenuCategoryDTO> allMenu = menuService.getAllMenu(storeId);
@@ -107,27 +111,73 @@ public class MenuServiceTest {
     }
 
     @Test
-    void getMenu_NotFound() throws IOException {
-        // Assertions.assertThrows(EntityNotFoundException.class, () -> {
-        // menuService.getMenu(0L);
-        // });
+    void getMenu_NotFound_Menu() {
+        ObjectId menuId = new ObjectId("111111111111111111111111");
+        when(menuRepository.findByMenuId(menuId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> menuService.getMenu("invalidStoreId", menuId.toString()))
+            .isInstanceOf(MenuNotFoundException.class)
+            .hasMessageStartingWith("Menu not found for menuId:");
     }
 
     @Test
-    void getMenu_Success() throws IOException {
-        // Store mockStore = DataLoader.getStoreInfo("store.json");
-        // Long storeId = mockStore.getStoreId();
-        // StoreContext.setStoreId(storeId);
-        //
-        // Menu mockMenu = mockStore.getCategories().get(0).getMenu().get(0);
-        // Long menuId = mockMenu.getMenuId();
-        //
-        // when(menuRepository.findByMenuIdAndStore_StoreId(storeId, menuId)).thenReturn(Optional.of(mockMenu));
-        //
-        // MenuDTO menu = menuService.getMenu(menuId);
-        //
-        // assertThat(menu).isNotNull();
-        // assertThat(menu).isEqualTo(MenuMapper.INSTANCE.toDTO(mockMenu));
+    void getMenu_NotFound_Category() {
+        String fileName = "pizza.json";
+        Menu mockMenu = DataLoader.getMenuList(fileName).get(0);
+
+        ObjectId menuId = mockMenu.getMenuId();
+        when(menuRepository.findByMenuId(menuId)).thenReturn(Optional.of(mockMenu));
+        when(categoryRepository.findByCategoryId(mockMenu.getCategoryId())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> menuService.getMenu("invalidStoreId", menuId.toString()))
+            .isInstanceOf(StoreNotFoundException.class)
+            .hasMessageStartingWith("Store not found for categoryId:")
+        ;
+    }
+
+    @Test
+    void getMenu_Mismatch() {
+        String fileName = "pizza.json";
+        Menu mockMenu = DataLoader.getMenuList(fileName).get(0);
+        Category mockCategory = new Category();
+        mockCategory.setCategoryId(mockMenu.getCategoryId());
+        mockCategory.setStoreId(new ObjectId("111111111111111111111111"));
+
+        ObjectId menuId = mockMenu.getMenuId();
+        when(menuRepository.findByMenuId(menuId)).thenReturn(Optional.of(mockMenu));
+        when(categoryRepository.findByCategoryId(mockMenu.getCategoryId())).thenReturn(Optional.of(mockCategory));
+
+        assertThatThrownBy(() -> menuService.getMenu("222222222222222222222222", menuId.toString()))
+            .isInstanceOf(StoreNotFoundException.class)
+            .hasMessageStartingWith("Store mismatch:")
+        ;
+    }
+
+    @Test
+    void getMenu_Success() {
+        String fileName = "pizza.json";
+        Menu mockMenu = DataLoader.getMenuList(fileName).get(0);
+
+        ObjectId categoryId = mockMenu.getCategoryId();
+        ObjectId menuId = mockMenu.getMenuId();
+
+        String storeId = "";
+        Category mockCategory = null;
+        for (Category category : DataLoader.getCategoryList(fileName)) {
+            if (category.getCategoryId().equals(categoryId)) {
+                mockCategory = category;
+                storeId = category.getStoreId().toString();
+                break;
+            }
+        }
+
+        when(menuRepository.findByMenuId(menuId)).thenReturn(Optional.of(mockMenu));
+        when(categoryRepository.findByCategoryId(categoryId)).thenReturn(Optional.of(mockCategory));
+
+        MenuDTO menu = menuService.getMenu(storeId, menuId.toString());
+
+        assertThat(menu).isNotNull();
+        assertThat(menu).isEqualTo(MenuMapper.INSTANCE.toDTO(mockMenu));
     }
 
 }
