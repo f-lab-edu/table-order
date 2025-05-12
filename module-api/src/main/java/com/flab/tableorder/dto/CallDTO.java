@@ -6,6 +6,6 @@ import lombok.Setter;
 
 @Getter @Setter @Data
 public class CallDTO {
-    private long callId = 0;
-    private String callName = "";
+    private long callId;
+    private String callName;
 }

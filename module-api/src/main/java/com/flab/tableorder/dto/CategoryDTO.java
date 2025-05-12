@@ -6,8 +6,8 @@ import lombok.Setter;
 
 @Getter @Setter @Data
 public class CategoryDTO {
-    private String categoryId = "";
-    private String categoryName = "";
+    private String categoryId;
+    private String categoryName;
     // multiple == true : 다중 선택
     private boolean multiple = false;
     // required == true : 필수 선택
