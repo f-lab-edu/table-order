@@ -24,7 +24,7 @@ public class StoreService {
         log.info("캐시에 API Key가 존재하지 않음... DB Select");
 
         Store store = storeRepository.findByApiKey(apiKey)
-            .orElseThrow(() -> new StoreNotFoundException(apiKey));
+            .orElseThrow(() -> new StoreNotFoundException("Store not found for API key: " + apiKey));
 
         return store.getStoreId().toString();
     }

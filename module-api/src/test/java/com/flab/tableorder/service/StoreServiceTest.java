@@ -27,7 +27,8 @@ public class StoreServiceTest {
         when(storeRepository.findByApiKey(apiKey)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> storeService.getStoreIdByApiKey(apiKey))
-                .isInstanceOf(StoreNotFoundException.class);
+            .isInstanceOf(StoreNotFoundException.class)
+            .hasMessageStartingWith("Store not found for API key:");
     }
 
     @Test
