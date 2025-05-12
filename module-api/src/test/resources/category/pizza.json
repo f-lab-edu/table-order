@@ -1,6 +1,6 @@
 [
     {
-        "_id" : "681edb5be8f2f34d23ecf6b2",
+        "categoryId" : "681edb5be8f2f34d23ecf6b2",
         "categoryName" : "피자",
         "multiple" : false,
         "required" : false,
@@ -8,7 +8,7 @@
         "storeId" : "681edb5be8f2f34d23ecf6b1"
     },
     {
-        "_id" : "681edb5be8f2f34d23ecf6b3",
+        "categoryId" : "681edb5be8f2f34d23ecf6b3",
         "categoryName" : "사이드",
         "multiple" : false,
         "required" : false,

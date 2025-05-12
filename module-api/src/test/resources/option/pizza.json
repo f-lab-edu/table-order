@@ -1,6 +1,6 @@
 [
     {
-        "_id" : "681edb5be8f2f34d23ecf6b7",
+        "categoryId" : "681edb5be8f2f34d23ecf6b7",
         "categoryName" : "토핑",
         "multiple" : true,
         "required" : false,
@@ -27,7 +27,7 @@
         ]
     },
     {
-        "_id" : "681edb5be8f2f34d23ecf6b8",
+        "categoryId" : "681edb5be8f2f34d23ecf6b8",
         "categoryName" : "엣지",
         "multiple" : false,
         "required" : false,

@@ -1,6 +1,6 @@
 [
     {
-        "_id" : "681edb5be8f2f34d23ecf6b4",
+        "menuId" : "681edb5be8f2f34d23ecf6b4",
         "menuName" : "치즈 피자",
         "price" : 8000,
         "image" : "https://image.table-order.com/1_1.jpg",
@@ -10,7 +10,7 @@
         "categoryId" : "681edb5be8f2f34d23ecf6b2"
     },
     {
-        "_id" : "681edb5be8f2f34d23ecf6b5",
+        "menuId" : "681edb5be8f2f34d23ecf6b5",
         "menuName" : "페퍼로니 피자",
         "price" : 9000,
         "salePrice" : 8500,
@@ -21,7 +21,7 @@
         "categoryId" : "681edb5be8f2f34d23ecf6b2"
     },
     {
-        "_id" : "681edb5be8f2f34d23ecf6b6",
+        "menuId" : "681edb5be8f2f34d23ecf6b6",
         "menuName" : "치즈 오븐 스파게티",
         "price" : 4000,
         "image" : "https://image.table-order.com/1_3.jpg",
