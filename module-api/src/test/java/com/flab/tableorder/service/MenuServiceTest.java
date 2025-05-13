@@ -43,7 +43,7 @@ public class MenuServiceTest {
 
     @Test
     void getAllMenu_Empty_Category() {
-        Store mockStore = DataLoader.getStoreInfo("pizza.json");
+        Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
         ObjectId objectId = mockStore.getStoreId();
         String storeId = objectId.toString();
 
@@ -57,11 +57,11 @@ public class MenuServiceTest {
     void getAllMenu_Empty_Menu() {
         String fileName = "pizza.json";
 
-        Store mockStore = DataLoader.getStoreInfo(fileName);
+        Store mockStore = DataLoader.getDataInfo("store", fileName, Store.class);
         ObjectId objectId = mockStore.getStoreId();
         String storeId = objectId.toString();
 
-        List<Category> categoryList = DataLoader.getCategoryList(fileName);
+        List<Category> categoryList = DataLoader.getDataList("category", fileName, Category.class);
         List<ObjectId> categoryIds = categoryList.stream()
             .map(category -> category.getCategoryId())
             .collect(Collectors.toList());
@@ -83,16 +83,16 @@ public class MenuServiceTest {
     void getAllMenu_NotEmpty() {
         String fileName = "pizza.json";
 
-        Store mockStore = DataLoader.getStoreInfo(fileName);
+        Store mockStore = DataLoader.getDataInfo("store", fileName, Store.class);
         ObjectId objectId = mockStore.getStoreId();
         String storeId = objectId.toString();
 
-        List<Category> categoryList = DataLoader.getCategoryList(fileName);
+        List<Category> categoryList = DataLoader.getDataList("category", fileName, Category.class);
         List<ObjectId> categoryIds = categoryList.stream()
             .map(category -> category.getCategoryId())
             .collect(Collectors.toList());
 
-        List<Menu> menuList = DataLoader.getMenuList(fileName);
+        List<Menu> menuList = DataLoader.getDataList("menu", fileName, Menu.class);
 
         when(categoryRepository.findAllByStoreId(objectId)).thenReturn(categoryList);
         when(menuRepository.findAllByCategoryIdIn(categoryIds)).thenReturn(menuList);
@@ -123,7 +123,7 @@ public class MenuServiceTest {
     @Test
     void getMenu_NotFound_Category() {
         String fileName = "pizza.json";
-        Menu mockMenu = DataLoader.getMenuList(fileName).get(0);
+        Menu mockMenu = (Menu) DataLoader.getDataList("menu", fileName, Menu.class).get(0);
 
         ObjectId menuId = mockMenu.getMenuId();
         when(menuRepository.findByMenuId(menuId)).thenReturn(Optional.of(mockMenu));
@@ -138,7 +138,7 @@ public class MenuServiceTest {
     @Test
     void getMenu_Mismatch() {
         String fileName = "pizza.json";
-        Menu mockMenu = DataLoader.getMenuList(fileName).get(0);
+        Menu mockMenu = (Menu) DataLoader.getDataList("menu", fileName, Menu.class).get(0);
         Category mockCategory = new Category();
         mockCategory.setCategoryId(mockMenu.getCategoryId());
         mockCategory.setStoreId(new ObjectId("111111111111111111111111"));
@@ -156,14 +156,14 @@ public class MenuServiceTest {
     @Test
     void getMenu_Success() {
         String fileName = "pizza.json";
-        Menu mockMenu = DataLoader.getMenuList(fileName).get(0);
+        Menu mockMenu = (Menu) DataLoader.getDataList("menu", fileName, Menu.class).get(0);
 
         ObjectId categoryId = mockMenu.getCategoryId();
         ObjectId menuId = mockMenu.getMenuId();
 
         String storeId = "";
         Category mockCategory = null;
-        for (Category category : DataLoader.getCategoryList(fileName)) {
+        for (Category category : (List<Category>) DataLoader.getDataList("category", fileName, Category.class)) {
             if (category.getCategoryId().equals(categoryId)) {
                 mockCategory = category;
                 storeId = category.getStoreId().toString();

@@ -1,6 +1,8 @@
 package com.flab.tableorder.controller;
 
 import com.flab.tableorder.DataLoader;
+import com.flab.tableorder.domain.Call;
+import com.flab.tableorder.domain.CallRepository;
 import com.flab.tableorder.domain.Category;
 import com.flab.tableorder.domain.CategoryRepository;
 import com.flab.tableorder.domain.MenuRepository;
@@ -33,6 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -56,8 +59,8 @@ class MenuControllerTests {
 
     @Autowired
     private TestRestTemplate restTemplate;
-    @Autowired
-    Environment env;
+    @Value("${db.data.init}")
+    private String isInit;
 
     @Autowired
     private StoreRepository storeRepository;
@@ -67,6 +70,8 @@ class MenuControllerTests {
     private MenuRepository menuRepository;
     @Autowired
     private OptionRepository optionRepository;
+    @Autowired
+    private CallRepository callRepository;
 
     private StoreDTO storeDTO;
     private String url;
@@ -76,11 +81,13 @@ class MenuControllerTests {
     private List<Category> categoryList;
     private List<Menu> menuList;
     private List<OptionCategory> optionCategoryList;
+    private List<Call> callList;
 
     @BeforeAll
     void init() {
         this.url = "http://localhost:" + port + "/menu";
-        this.store = DataLoader.getStoreInfo("pizza.json");
+        String fileName = "pizza.json";
+        this.store = DataLoader.getDataInfo("store", fileName, Store.class);
         this.storeDTO = StoreMapper.INSTANCE.toDTO(store);
 
         if (store != null) {
@@ -89,9 +96,10 @@ class MenuControllerTests {
             this.httpEntity = new HttpEntity<>(headers);
         }
 
-        this.categoryList = DataLoader.getCategoryList("pizza.json");
-        this.menuList = DataLoader.getMenuList("pizza.json");
-        this.optionCategoryList = DataLoader.getOptionList("pizza.json");
+        this.categoryList = DataLoader.getDataList("category", fileName, Category.class);
+        this.menuList = DataLoader.getDataList("menu", fileName, Menu.class);
+        this.optionCategoryList = DataLoader.getDataList("option", fileName, OptionCategory.class);
+        this.callList = DataLoader.getDataList("call", fileName, Call.class);
 
         Map<String, List<Menu>> menuListMap = menuList.isEmpty()
             ? new HashMap<>()
@@ -111,10 +119,13 @@ class MenuControllerTests {
 
     @Test
     public void saveData() {
+        if (!isInit.equals("true")) return;
+
         if (this.store != null) storeRepository.save(store);
         if (this.categoryList != null) categoryRepository.saveAll(categoryList);
         if (this.menuList != null) menuRepository.saveAll(menuList);
         if (this.optionCategoryList != null) optionRepository.saveAll(optionCategoryList);
+        if (this.callList != null) callRepository.saveAll(callList);
     }
 
     @Test

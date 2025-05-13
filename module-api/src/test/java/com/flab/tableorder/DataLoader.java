@@ -1,5 +1,7 @@
 package com.flab.tableorder;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.flab.tableorder.domain.Call;
 import com.flab.tableorder.domain.Category;
 import com.flab.tableorder.domain.Menu;
 import com.flab.tableorder.domain.OptionCategory;
@@ -7,10 +9,13 @@ import com.flab.tableorder.domain.Store;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
@@ -31,42 +36,30 @@ public class DataLoader {
         return responseEntity.getBody();
     }
 
-    public static Store getStoreInfo(String fileName) {
-        InputStream inputStream = DataLoader.class.getResourceAsStream("/store/" + fileName);
+    private static <T> T getDataFromStream(String dir, String fileName, JavaType javaType) {
+        String separator = "/";
+        StringJoiner stringJoiner = new StringJoiner(separator, separator, "")
+            .add(dir)
+            .add(fileName);
 
-        Store store = null;
+        InputStream inputStream = DataLoader.class.getResourceAsStream(stringJoiner.toString());
+
+        T data = null;
         try {
-            store = objectMapper.readValue(inputStream, Store.class);
+            data = objectMapper.readValue(inputStream, javaType);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        return store;
+        return data;
     }
 
-    public static List getListFromStream(String dir, String fileName, Class cls) {
-        InputStream inputStream = DataLoader.class.getResourceAsStream("/" + dir + "/" + fileName);
-
-        List list = null;
-        try {
-            list = objectMapper.readValue(inputStream, objectMapper.getTypeFactory()
-                .constructCollectionType(List.class, cls)
-            );
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return list;
+    public static <T> T getDataInfo(String dir, String fileName, Class cls) {
+        return getDataFromStream(dir, fileName, objectMapper.constructType(cls));
     }
 
-    public static List<Category> getCategoryList(String fileName) {
-        return getListFromStream("category", fileName, Category.class);
-    }
-
-    public static List<Menu> getMenuList(String fileName) {
-        return getListFromStream("menu", fileName, Menu.class);
-    }
-
-    public static List<OptionCategory> getOptionList(String fileName) {
-        return getListFromStream("option", fileName, OptionCategory.class);
+    public static List getDataList(String dir, String fileName, Class cls) {
+        return getDataFromStream(dir, fileName, objectMapper.getTypeFactory()
+            .constructCollectionType(List.class, cls));
     }
 }
