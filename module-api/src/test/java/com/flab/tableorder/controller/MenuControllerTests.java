@@ -169,7 +169,7 @@ class MenuControllerTests {
     }
 
      @Test
-     void getMenu_Success() throws Exception {
+     void getMenu_Success() {
          Menu storeMenu = this.menuList.get(0);
          String menuId = storeMenu.getMenuId().toString();
 
@@ -183,13 +183,18 @@ class MenuControllerTests {
          assertThat(resMenu.get("menuName")).isEqualTo(storeMenu.getMenuName());
      }
 
-    // @Test
-    // void getCallSuccess() throws Exception {
-    // mockMvc.perform(get("/menu/call"))
-    // .andExpect(status().isOk())
-    // .andExpect(jsonPath("$.code").value(200))
-    //// .andExpect(jsonPath("$.data", hasSize(greaterThan(0))))
-    // ;
-    // }
+     @Test
+     void getCallSuccess() {
+         Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url + "/call", HttpMethod.GET, this.httpEntity);
+
+         assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
+         List<Map<String, Object>> resCallList = (List<Map<String, Object>>) responseData.get("data");
+
+         assertThat(resCallList.size()).isEqualTo(this.callList.size());
+         for (int i = 0; i < resCallList.size(); i++) {
+             assertThat(resCallList.get(i).get("callId")).isEqualTo(this.callList.get(i).getCallId().toString());
+             assertThat(resCallList.get(i).get("callName")).isEqualTo(this.callList.get(i).getCallName());
+         }
+     }
 
 }

@@ -1,14 +1,16 @@
 package com.flab.tableorder.service;
 
 import com.flab.tableorder.DataLoader;
+import com.flab.tableorder.domain.Call;
+import com.flab.tableorder.domain.CallRepository;
 import com.flab.tableorder.domain.Category;
 import com.flab.tableorder.domain.CategoryRepository;
 import com.flab.tableorder.domain.Menu;
 import com.flab.tableorder.domain.MenuRepository;
 import com.flab.tableorder.domain.Store;
+import com.flab.tableorder.dto.CallDTO;
 import com.flab.tableorder.dto.MenuCategoryDTO;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 import com.flab.tableorder.dto.MenuDTO;
 import com.flab.tableorder.exception.MenuNotFoundException;
 import com.flab.tableorder.exception.StoreNotFoundException;
+import com.flab.tableorder.mapper.CallMapper;
 import com.flab.tableorder.mapper.MenuMapper;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
@@ -37,6 +40,8 @@ public class MenuServiceTest {
     private MenuRepository menuRepository;
     @Mock
     private CategoryRepository categoryRepository;
+    @Mock
+    private CallRepository callRepository;
 
     @InjectMocks
     private MenuService menuService;
@@ -178,6 +183,23 @@ public class MenuServiceTest {
 
         assertThat(menu).isNotNull();
         assertThat(menu).isEqualTo(MenuMapper.INSTANCE.toDTO(mockMenu));
+    }
+
+    @Test
+    void getCall_Success() {
+        String fileName = "pizza.json";
+
+        Store mockStore = DataLoader.getDataInfo("store", fileName, Store.class);
+        ObjectId objectId = mockStore.getStoreId();
+        String storeId = objectId.toString();
+
+        List<Call> mockCallList = DataLoader.getDataList("call", fileName, Call.class);
+
+        when(callRepository.findAllByStoreId(objectId)).thenReturn(mockCallList);
+
+        List<CallDTO> callList = menuService.getAllCall(storeId);
+
+        assertThat(callList).isEqualTo(CallMapper.INSTANCE.toDTO(mockCallList));
     }
 
 }

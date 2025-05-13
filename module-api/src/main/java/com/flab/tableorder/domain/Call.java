@@ -13,4 +13,5 @@ public class Call {
     @Id @Field("_id")
     private ObjectId callId;
     private String callName;
+    private ObjectId storeId;
 }

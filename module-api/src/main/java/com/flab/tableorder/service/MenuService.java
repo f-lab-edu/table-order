@@ -1,13 +1,16 @@
 package com.flab.tableorder.service;
 
+import com.flab.tableorder.domain.CallRepository;
 import com.flab.tableorder.domain.Category;
 import com.flab.tableorder.domain.CategoryRepository;
 import com.flab.tableorder.domain.Menu;
 import com.flab.tableorder.domain.MenuRepository;
+import com.flab.tableorder.dto.CallDTO;
 import com.flab.tableorder.dto.MenuCategoryDTO;
 import com.flab.tableorder.dto.MenuDTO;
 import com.flab.tableorder.exception.MenuNotFoundException;
 import com.flab.tableorder.exception.StoreNotFoundException;
+import com.flab.tableorder.mapper.CallMapper;
 import com.flab.tableorder.mapper.CategoryMapper;
 import com.flab.tableorder.mapper.MenuMapper;
 
@@ -31,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MenuService {
     private final CategoryRepository categoryRepository;
     private final MenuRepository menuRepository;
+    private final CallRepository callRepository;
 
     @Transactional(readOnly = true)
     public List<MenuCategoryDTO> getAllMenu(String storeId) {
@@ -74,5 +78,10 @@ public class MenuService {
         if (!findStoreId.equals(storeId)) throw new StoreNotFoundException("Store mismatch: expected " + findStoreId + ", but got " + storeId);
 
         return MenuMapper.INSTANCE.toDTO(menu);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CallDTO> getAllCall(String storeId) {
+        return CallMapper.INSTANCE.toDTO(callRepository.findAllByStoreId(new ObjectId(storeId)));
     }
 }

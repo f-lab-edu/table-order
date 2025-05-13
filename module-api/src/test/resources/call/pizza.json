@@ -1,14 +1,17 @@
 [
     {
         "callId" : "681edb5be8f2f34d23ecf6b9",
-        "callName" : "물"
+        "callName" : "물",
+        "storeId" : "681edb5be8f2f34d23ecf6b1"
     },
     {
         "callId" : "681edb5be8f2f34d23ecf6c0",
-        "callName" : "젓가락"
+        "callName" : "젓가락",
+        "storeId" : "681edb5be8f2f34d23ecf6b1"
     },
     {
         "callId" : "681edb5be8f2f34d23ecf6c1",
-        "callName" : "호출"
+        "callName" : "호출",
+        "storeId" : "681edb5be8f2f34d23ecf6b1"
     }
 ]
