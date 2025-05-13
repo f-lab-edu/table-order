@@ -1,0 +1,18 @@
+[
+    {
+        "categoryId" : "681edb5be8f2f34d23ecf6b2",
+        "categoryName" : "피자",
+        "multiple" : false,
+        "required" : false,
+        "maxSelect" : 0,
+        "storeId" : "681edb5be8f2f34d23ecf6b1"
+    },
+    {
+        "categoryId" : "681edb5be8f2f34d23ecf6b3",
+        "categoryName" : "사이드",
+        "multiple" : false,
+        "required" : false,
+        "maxSelect" : 0,
+        "storeId" : "681edb5be8f2f34d23ecf6b1"
+    }
+]

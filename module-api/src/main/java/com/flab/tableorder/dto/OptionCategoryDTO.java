@@ -1,11 +1,11 @@
 package com.flab.tableorder.dto;
 
-import lombok.*;
-
 import java.util.List;
 
-@Getter
-@Setter
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter @Setter
 public class OptionCategoryDTO extends CategoryDTO {
-	private List<OptionDTO> options;
+    private List<OptionDTO> options;
 }

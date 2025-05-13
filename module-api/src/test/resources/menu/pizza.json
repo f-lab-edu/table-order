@@ -1,0 +1,33 @@
+[
+    {
+        "menuId" : "681edb5be8f2f34d23ecf6b4",
+        "menuName" : "치즈 피자",
+        "price" : 8000,
+        "image" : "https://image.table-order.com/1_1.jpg",
+        "soldOut" : false,
+        "optionEnabled" : true,
+        "tags" : ["BEST"],
+        "categoryId" : "681edb5be8f2f34d23ecf6b2"
+    },
+    {
+        "menuId" : "681edb5be8f2f34d23ecf6b5",
+        "menuName" : "페퍼로니 피자",
+        "price" : 9000,
+        "salePrice" : 8500,
+        "image" : "https://image.table-order.com/1_2.jpg",
+        "soldOut" : false,
+        "optionEnabled" : true,
+        "tags" : ["NEW"],
+        "categoryId" : "681edb5be8f2f34d23ecf6b2"
+    },
+    {
+        "menuId" : "681edb5be8f2f34d23ecf6b6",
+        "menuName" : "치즈 오븐 스파게티",
+        "price" : 4000,
+        "image" : "https://image.table-order.com/1_3.jpg",
+        "soldOut" : false,
+        "optionEnabled" : false,
+        "tags" : ["BEST", "SPICY"],
+        "categoryId" : "681edb5be8f2f34d23ecf6b3"
+    }
+]
