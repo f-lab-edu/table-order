@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CategoryRepository extends MongoRepository<Category, Long> {
+public interface CategoryRepository extends MongoRepository<Category, ObjectId> {
     List<Category> findAllByStoreId(ObjectId storeId);
     Optional<Category> findByCategoryId(ObjectId categoryId);
 }

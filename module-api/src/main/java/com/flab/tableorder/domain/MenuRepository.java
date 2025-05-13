@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface MenuRepository extends MongoRepository<Menu, Long> {
+public interface MenuRepository extends MongoRepository<Menu, ObjectId> {
     List<Menu> findAllByCategoryIdIn(List<ObjectId> categoryIds);
     Optional<Menu> findByMenuId(ObjectId menuId);
 }
