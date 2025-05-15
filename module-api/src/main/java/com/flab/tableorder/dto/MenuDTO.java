@@ -13,7 +13,6 @@ public class MenuDTO {
     private String menuId;
     private String menuName;
     private String description;
-    private int quantity = 0;
     private int price;
     private int salePrice = 0;
     private String image;

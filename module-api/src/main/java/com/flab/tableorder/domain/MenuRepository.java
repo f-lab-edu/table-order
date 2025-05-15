@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MenuRepository extends MongoRepository<Menu, ObjectId> {
+    List<Menu> findAllByMenuIdIn(List<ObjectId> menuIds);
     List<Menu> findAllByCategoryIdIn(List<ObjectId> categoryIds);
     Optional<Menu> findByMenuId(ObjectId menuId);
 }

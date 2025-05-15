@@ -8,4 +8,5 @@ import java.util.List;
 
 @Repository
 public interface OptionRepository extends MongoRepository<OptionCategory, ObjectId> {
+    List<Option> findAllByOptionIdIn(List<ObjectId> optionIds);
 }
