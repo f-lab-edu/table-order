@@ -33,19 +33,19 @@ public class MenuController {
     }
 
     @GetMapping("/{menuId}")
-    public ResponseEntity<ResponseDTO<MenuDTO>> getMenuByMenuId(@PathVariable String menuId) {
+    public ResponseEntity<ResponseDTO> getMenuByMenuId(@PathVariable String menuId) {
         MenuDTO menu = menuService.getMenu(StoreContext.getStoreId(), menuId);
 
-        ResponseDTO<MenuDTO> responseData = new ResponseDTO<>(200, "", menu);
+        ResponseDTO responseData = new ResponseDTO<>(200, "", menu);
 
         return ResponseEntity.ok(responseData);
     }
 
     @GetMapping("/call")
-    public ResponseEntity<ResponseDTO<List<CallDTO>>> getCallMenu() {
+    public ResponseEntity<ResponseDTO> getCallMenu() {
         List<CallDTO> callList = menuService.getAllCall(StoreContext.getStoreId());
 
-        ResponseDTO<List<CallDTO>> responseData = new ResponseDTO<>(200, "", callList);
+        ResponseDTO responseData = new ResponseDTO<>(200, "", callList);
 
         return ResponseEntity.ok(responseData);
     }
