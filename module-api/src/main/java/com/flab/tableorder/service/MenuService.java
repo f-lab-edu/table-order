@@ -43,7 +43,7 @@ public class MenuService {
 
         List<ObjectId> categoryIds = categoryList.stream()
             .map(category -> category.getCategoryId())
-            .collect(Collectors.toList());
+            .toList();
 
         List<Menu> menuList = menuRepository.findAllByCategoryIdIn(categoryIds);
         Map<String, List<Menu>> menuListMap = menuList.isEmpty()
@@ -60,7 +60,7 @@ public class MenuService {
                 menuCategoryDTO.setMenu(menus);
                 return menuCategoryDTO;
             })
-            .collect(Collectors.toList());
+            .toList();
     }
 
     @Transactional(readOnly = true)

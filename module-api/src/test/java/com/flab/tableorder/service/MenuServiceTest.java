@@ -69,7 +69,7 @@ public class MenuServiceTest {
         List<Category> categoryList = DataLoader.getDataList("category", fileName, Category.class);
         List<ObjectId> categoryIds = categoryList.stream()
             .map(category -> category.getCategoryId())
-            .collect(Collectors.toList());
+            .toList();
 
         when(categoryRepository.findAllByStoreId(objectId)).thenReturn(categoryList);
         when(menuRepository.findAllByCategoryIdIn(categoryIds)).thenReturn(new ArrayList<>());
@@ -95,7 +95,7 @@ public class MenuServiceTest {
         List<Category> categoryList = DataLoader.getDataList("category", fileName, Category.class);
         List<ObjectId> categoryIds = categoryList.stream()
             .map(category -> category.getCategoryId())
-            .collect(Collectors.toList());
+            .toList();
 
         List<Menu> menuList = DataLoader.getDataList("menu", fileName, Menu.class);
 
