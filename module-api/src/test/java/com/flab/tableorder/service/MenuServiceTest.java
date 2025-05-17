@@ -56,7 +56,7 @@ public class MenuServiceTest {
         ObjectId objectId = mockStore.getStoreId();
         String storeId = objectId.toString();
 
-        when(categoryRepository.findAllByStoreIdAndOptionFalse(objectId)).thenReturn(new ArrayList<>());
+        when(categoryRepository.findAllByStoreIdAndOptionFalse(objectId)).thenReturn(List.of());
 
         List<MenuCategoryDTO> allMenu = menuService.getAllMenu(storeId);
         assertThat(allMenu).isEmpty();
@@ -79,7 +79,7 @@ public class MenuServiceTest {
             .toList();
 
         when(categoryRepository.findAllByStoreIdAndOptionFalse(objectId)).thenReturn(categoryList);
-        when(menuRepository.findAllByCategoryIdIn(categoryIds)).thenReturn(new ArrayList<>());
+        when(menuRepository.findAllByCategoryIdIn(categoryIds)).thenReturn(List.of());
 
         List<MenuCategoryDTO> allMenu = menuService.getAllMenu(storeId);
 
@@ -204,7 +204,7 @@ public class MenuServiceTest {
         MenuDTO menu = menuService.getMenu(storeId, menuId.toString());
 
         assertThat(menu.getMenuId()).isEqualTo(mockMenu.getMenuId().toString());
-        assertThat(menu.isOptionEnabled() && menu.getOptions() == null).isFalse();
+        assertThat(menu.getOptions()).isNotNull();
     }
 
     @Test

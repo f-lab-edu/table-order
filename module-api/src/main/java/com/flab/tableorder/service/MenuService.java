@@ -44,7 +44,7 @@ public class MenuService {
     @Transactional(readOnly = true)
     public List<MenuCategoryDTO> getAllMenu(String storeId) {
         List<Category> categoryList = categoryRepository.findAllByStoreIdAndOptionFalse(new ObjectId(storeId));
-        if (categoryList.isEmpty()) return new ArrayList<>();
+        if (categoryList.isEmpty()) return List.of();
 
         List<ObjectId> categoryIds = categoryList.stream()
             .map(category -> category.getCategoryId())

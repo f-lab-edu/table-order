@@ -113,7 +113,7 @@ class MenuControllerTests {
 
         for (MenuCategoryDTO menuCategoryDTO : menuCategoryDTOList) {
             List<Menu> menuEntity = menuListMap.get(menuCategoryDTO.getCategoryId());
-            List<MenuDTO> menu = menuEntity == null ? new ArrayList<>() : MenuMapper.INSTANCE.toDTO(menuEntity);
+            List<MenuDTO> menu = menuEntity == null ? List.of() : MenuMapper.INSTANCE.toDTO(menuEntity);
             menuCategoryDTO.setMenu(menu);
         }
 
