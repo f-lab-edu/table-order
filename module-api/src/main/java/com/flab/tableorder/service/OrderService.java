@@ -75,9 +75,9 @@ public class OrderService {
             throw new MenuNotFoundException("Attempted to order a option item that does not exist.");
 
         for (Option option : optionList) {
-            if (option.getPrice() != menuPriceMap.get(option.getOptionId()))
+            if (option.getPrice() != optionPriceMap.get(option.getOptionId()))
                 throw new PriceNotMatchedException("Option price does not match.",
-                    menuPriceMap.get(option.getOptionId()),
+                    optionPriceMap.get(option.getOptionId()),
                     option.getPrice());
         }
         
