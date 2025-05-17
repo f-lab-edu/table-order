@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(EntityNotFoundException.class)
+    @ExceptionHandler({EntityNotFoundException.class, StoreNotFoundException.class, MenuNotFoundException.class})
     public ResponseEntity<ResponseDTO> handleEntityNotFound(EntityNotFoundException ex) {
         ResponseDTO responseData = new ResponseDTO(404, ex.getMessage());
 
