@@ -7,7 +7,7 @@ import com.flab.tableorder.domain.Category;
 import com.flab.tableorder.domain.CategoryRepository;
 import com.flab.tableorder.domain.MenuRepository;
 import com.flab.tableorder.domain.Menu;
-import com.flab.tableorder.domain.OptionCategory;
+import com.flab.tableorder.domain.Option;
 import com.flab.tableorder.domain.OptionRepository;
 import com.flab.tableorder.domain.Store;
 import com.flab.tableorder.domain.StoreRepository;
@@ -18,15 +18,14 @@ import com.flab.tableorder.mapper.CategoryMapper;
 import com.flab.tableorder.mapper.MenuMapper;
 import com.flab.tableorder.mapper.StoreMapper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.flab.tableorder.service.StoreService;
 import lombok.extern.slf4j.Slf4j;
 
 import org.bson.types.ObjectId;
@@ -40,12 +39,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -61,7 +58,11 @@ class MenuControllerTests {
     private TestRestTemplate restTemplate;
     @Value("${db.data.init}")
     private String isInit;
+    @Value("${db.data.clear.storeId}")
+    private String clearStoreId;
 
+    @Autowired
+    private StoreService storeService;
     @Autowired
     private StoreRepository storeRepository;
     @Autowired
@@ -80,7 +81,7 @@ class MenuControllerTests {
     private Store store;
     private List<Category> categoryList;
     private List<Menu> menuList;
-    private List<OptionCategory> optionCategoryList;
+    private List<Option> optionList;
     private List<Call> callList;
 
     @BeforeAll
@@ -98,7 +99,7 @@ class MenuControllerTests {
 
         this.categoryList = DataLoader.getDataList("category", fileName, Category.class);
         this.menuList = DataLoader.getDataList("menu", fileName, Menu.class);
-        this.optionCategoryList = DataLoader.getDataList("option", fileName, OptionCategory.class);
+        this.optionList = DataLoader.getDataList("option", fileName, Option.class);
         this.callList = DataLoader.getDataList("call", fileName, Call.class);
 
         Map<String, List<Menu>> menuListMap = menuList.isEmpty()
@@ -106,7 +107,9 @@ class MenuControllerTests {
             : menuList.stream()
                 .collect(Collectors.groupingBy(menu -> menu.getCategoryId().toString()));
 
-        List<MenuCategoryDTO> menuCategoryDTOList = CategoryMapper.INSTANCE.toDTO(categoryList);
+        List<MenuCategoryDTO> menuCategoryDTOList = CategoryMapper.INSTANCE.toDTO(categoryList.stream()
+            .filter(category -> !category.isOption())
+            .toList());
 
         for (MenuCategoryDTO menuCategoryDTO : menuCategoryDTOList) {
             List<Menu> menuEntity = menuListMap.get(menuCategoryDTO.getCategoryId());
@@ -121,10 +124,14 @@ class MenuControllerTests {
     public void saveData() {
         if (!isInit.equals("true")) return;
 
+        Optional.ofNullable(clearStoreId)
+            .filter(el -> !el.isEmpty())
+            .ifPresent(id -> storeService.deleteAllStore(id));
+
         if (this.store != null) storeRepository.save(store);
         if (this.categoryList != null) categoryRepository.saveAll(categoryList);
         if (this.menuList != null) menuRepository.saveAll(menuList);
-        if (this.optionCategoryList != null) optionRepository.saveAll(optionCategoryList);
+        if (this.optionList != null) optionRepository.saveAll(optionList);
         if (this.callList != null) callRepository.saveAll(callList);
     }
 

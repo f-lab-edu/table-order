@@ -8,5 +8,6 @@ import java.util.List;
 
 @Repository
 public interface CallRepository extends MongoRepository<Call, ObjectId> {
+    void deleteAllByStoreId(ObjectId storeId);
     List<Call> findAllByStoreId(ObjectId storeId);
 }
