@@ -1,34 +1,22 @@
 package com.flab.tableorder.controller;
 
 import com.flab.tableorder.DataLoader;
-import com.flab.tableorder.domain.Call;
 import com.flab.tableorder.domain.CallRepository;
-import com.flab.tableorder.domain.Category;
 import com.flab.tableorder.domain.CategoryRepository;
 import com.flab.tableorder.domain.MenuRepository;
 import com.flab.tableorder.domain.Menu;
-import com.flab.tableorder.domain.Option;
 import com.flab.tableorder.domain.OptionRepository;
-import com.flab.tableorder.domain.Store;
 import com.flab.tableorder.domain.StoreRepository;
 import com.flab.tableorder.dto.MenuCategoryDTO;
 import com.flab.tableorder.dto.MenuDTO;
-import com.flab.tableorder.dto.StoreDTO;
-import com.flab.tableorder.mapper.CategoryMapper;
-import com.flab.tableorder.mapper.MenuMapper;
-import com.flab.tableorder.mapper.StoreMapper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import com.flab.tableorder.service.StoreService;
 import lombok.extern.slf4j.Slf4j;
 
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -37,10 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
@@ -50,16 +36,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class MenuControllerTests {
-    @LocalServerPort
-    private int port;
-
+class MenuControllerTests extends AbstractControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
     @Value("${db.data.init}")
     private String isInit;
     @Value("${db.data.clear.storeId}")
     private String clearStoreId;
+
+    private HttpEntity<Void> httpEntity;
 
     @Autowired
     private StoreService storeService;
@@ -74,50 +59,12 @@ class MenuControllerTests {
     @Autowired
     private CallRepository callRepository;
 
-    private StoreDTO storeDTO;
-    private String url;
-    private HttpEntity<Void> httpEntity;
-
-    private Store store;
-    private List<Category> categoryList;
-    private List<Menu> menuList;
-    private List<Option> optionList;
-    private List<Call> callList;
-
     @BeforeAll
+    @Override
     void init() {
-        this.url = "http://localhost:" + port + "/menu";
-        String fileName = "pizza.json";
-        this.store = DataLoader.getDataInfo("store", fileName, Store.class);
-        this.storeDTO = StoreMapper.INSTANCE.toDTO(store);
+        super.init();
 
-        if (store != null) {
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + store.getApiKey());
-            this.httpEntity = new HttpEntity<>(headers);
-        }
-
-        this.categoryList = DataLoader.getDataList("category", fileName, Category.class);
-        this.menuList = DataLoader.getDataList("menu", fileName, Menu.class);
-        this.optionList = DataLoader.getDataList("option", fileName, Option.class);
-        this.callList = DataLoader.getDataList("call", fileName, Call.class);
-
-        Map<String, List<Menu>> menuListMap = menuList.isEmpty()
-            ? new HashMap<>()
-            : menuList.stream()
-                .collect(Collectors.groupingBy(menu -> menu.getCategoryId().toString()));
-
-        List<MenuCategoryDTO> menuCategoryDTOList = CategoryMapper.INSTANCE.toDTO(categoryList.stream()
-            .filter(category -> !category.isOption())
-            .toList());
-
-        for (MenuCategoryDTO menuCategoryDTO : menuCategoryDTOList) {
-            List<Menu> menuEntity = menuListMap.get(menuCategoryDTO.getCategoryId());
-            List<MenuDTO> menu = menuEntity == null ? List.of() : MenuMapper.INSTANCE.toDTO(menuEntity);
-            menuCategoryDTO.setMenu(menu);
-        }
-
-        this.storeDTO.setCategories(menuCategoryDTOList);
+        this.httpEntity = new HttpEntity<>(this.headers);
     }
 
     @Test
@@ -137,7 +84,7 @@ class MenuControllerTests {
 
     @Test
     void getAllMenu_Success() {
-        Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, this.httpEntity);
+        Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url + "/menu", HttpMethod.GET, this.httpEntity);
 
         assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
 
@@ -180,7 +127,7 @@ class MenuControllerTests {
          Menu storeMenu = this.menuList.get(0);
          String menuId = storeMenu.getMenuId().toString();
 
-         Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url + "/" + menuId, HttpMethod.GET, this.httpEntity);
+         Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url + "/menu/" + menuId, HttpMethod.GET, this.httpEntity);
 
          assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
 
@@ -192,7 +139,7 @@ class MenuControllerTests {
 
      @Test
      void getCallSuccess() {
-         Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url + "/call", HttpMethod.GET, this.httpEntity);
+         Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url + "/menu/call", HttpMethod.GET, this.httpEntity);
 
          assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
          List<Map<String, Object>> resCallList = (List<Map<String, Object>>) responseData.get("data");
