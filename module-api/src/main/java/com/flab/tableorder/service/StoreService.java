@@ -1,12 +1,20 @@
 package com.flab.tableorder.service;
 
+import com.flab.tableorder.domain.CallRepository;
+import com.flab.tableorder.domain.Category;
+import com.flab.tableorder.domain.CategoryRepository;
+import com.flab.tableorder.domain.MenuRepository;
+import com.flab.tableorder.domain.OptionRepository;
 import com.flab.tableorder.domain.Store;
 import com.flab.tableorder.domain.StoreRepository;
 import com.flab.tableorder.exception.StoreNotFoundException;
 
+import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.bson.types.ObjectId;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class StoreService {
 
     private final StoreRepository storeRepository;
+    private final CategoryRepository categoryRepository;
+    private final MenuRepository menuRepository;
+    private final OptionRepository optionRepository;
+    private final CallRepository callRepository;
 
     @Transactional(readOnly = true)
     @Cacheable(value = "storeCache", key = "#apiKey")
@@ -27,5 +39,24 @@ public class StoreService {
             .orElseThrow(() -> new StoreNotFoundException("Store not found for API key: " + apiKey));
 
         return store.getStoreId().toString();
+    }
+
+    @Transactional
+    public boolean deleteAllStore(String storeId) {
+        ObjectId objStoreId = new ObjectId(storeId);
+
+        callRepository.deleteAllByStoreId(objStoreId);
+        optionRepository.deleteAllByCategoryIdIn(categoryRepository.findAllByStoreIdAndOptionTrue(objStoreId)
+            .stream()
+            .map(category -> category.getCategoryId())
+            .toList());
+        menuRepository.deleteAllByCategoryIdIn(categoryRepository.findAllByStoreIdAndOptionFalse(objStoreId)
+            .stream()
+            .map(category -> category.getCategoryId())
+            .toList());
+        categoryRepository.deleteAllByStoreId(objStoreId);
+        storeRepository.deleteAllByStoreId(objStoreId);
+
+        return true;
     }
 }
