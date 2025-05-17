@@ -12,9 +12,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler({EntityNotFoundException.class, StoreNotFoundException.class, MenuNotFoundException.class})
-    public ResponseEntity<ResponseDTO> handleEntityNotFound(EntityNotFoundException ex) {
+    public ResponseEntity<ResponseDTO> handleEntityNotFound(RuntimeException ex) {
         ResponseDTO responseData = new ResponseDTO(404, ex.getMessage());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
+    }
+    @ExceptionHandler({PriceNotMatchedException.class})
+    public ResponseEntity<ResponseDTO> handleEntityNotMatched(RuntimeException ex) {
+        ResponseDTO responseData = new ResponseDTO(409, ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(responseData);
     }
 }

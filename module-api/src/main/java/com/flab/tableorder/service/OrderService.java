@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import com.flab.tableorder.exception.MenuNotFoundException;
+import com.flab.tableorder.exception.PriceNotMatchedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -64,7 +65,9 @@ public class OrderService {
 
         for (Menu menu : menuList) {
             if (menu.getPrice() != menuPriceMap.get(menu.getMenuId()))
-                throw new MenuNotFoundException("Menu price does not match.");
+                throw new PriceNotMatchedException("Menu price does not match.",
+                    menuPriceMap.get(menu.getMenuId()),
+                    menu.getPrice());
         }
 
         List<Option> optionList = optionRepository.findAllByOptionIdIn(optionIds);
@@ -73,7 +76,9 @@ public class OrderService {
 
         for (Option option : optionList) {
             if (option.getPrice() != menuPriceMap.get(option.getOptionId()))
-                throw new MenuNotFoundException("Option price does not match.");
+                throw new PriceNotMatchedException("Option price does not match.",
+                    menuPriceMap.get(option.getOptionId()),
+                    option.getPrice());
         }
         
 //        TODO: 주문 수량과 가격을 redis에 저장
