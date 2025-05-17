@@ -17,9 +17,10 @@ public class Category {
     private ObjectId categoryId;
 
     private String categoryName;
-    private boolean multiple;
-    private boolean required;
-    private int maxSelect;
+    private int maxSelect = 0;
+    private boolean multiple = true;
+    private boolean required = false;
+    private boolean option = false;
 
     private ObjectId storeId;
 }
