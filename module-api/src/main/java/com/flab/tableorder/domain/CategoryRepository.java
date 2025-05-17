@@ -13,5 +13,5 @@ public interface CategoryRepository extends MongoRepository<Category, ObjectId> 
     Optional<Category> findByCategoryId(ObjectId categoryId);
     List<Category> findAllByStoreIdAndOptionFalse(ObjectId storeId);
     List<Category> findAllByStoreIdAndOptionTrue(ObjectId storeId);
-    List<Category> findAllByCategoryIdInOptionTrue(List<ObjectId> categoryIds);
+    List<Category> findAllByCategoryIdInAndOptionTrue(List<ObjectId> categoryIds);
 }

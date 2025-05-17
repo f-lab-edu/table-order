@@ -199,7 +199,7 @@ public class MenuServiceTest {
             .toList();
 
         when(optionRepository.findAllByCategoryIdIn(categoryIds)).thenReturn(optionList);
-        when(categoryRepository.findAllByCategoryIdInOptionTrue(categoryIds)).thenReturn(categoryList);
+        when(categoryRepository.findAllByCategoryIdInAndOptionTrue(categoryIds)).thenReturn(categoryList);
 
         MenuDTO menu = menuService.getMenu(storeId, menuId.toString());
 

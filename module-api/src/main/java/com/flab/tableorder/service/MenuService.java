@@ -91,7 +91,7 @@ public class MenuService {
             Map<String, List<Option>> optionListMap = optionRepository.findAllByCategoryIdIn(categoryIds)
                 .stream().collect(Collectors.groupingBy(option -> option.getCategoryId().toString()));
 
-            returnMenu.setOptions(CategoryMapper.INSTANCE.toOptionDTO(categoryRepository.findAllByCategoryIdInOptionTrue(categoryIds))
+            returnMenu.setOptions(CategoryMapper.INSTANCE.toOptionDTO(categoryRepository.findAllByCategoryIdInAndOptionTrue(categoryIds))
                 .stream()
                 .map(categoryDTO -> {
                     List<OptionDTO> options = Optional.ofNullable(optionListMap.get(categoryDTO.getCategoryId()))
