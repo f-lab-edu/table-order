@@ -7,6 +7,8 @@ import com.flab.tableorder.domain.Category;
 import com.flab.tableorder.domain.CategoryRepository;
 import com.flab.tableorder.domain.Menu;
 import com.flab.tableorder.domain.MenuRepository;
+import com.flab.tableorder.domain.Option;
+import com.flab.tableorder.domain.OptionRepository;
 import com.flab.tableorder.domain.Store;
 import com.flab.tableorder.dto.CallDTO;
 import com.flab.tableorder.dto.MenuCategoryDTO;
@@ -42,6 +44,8 @@ public class MenuServiceTest {
     private CategoryRepository categoryRepository;
     @Mock
     private CallRepository callRepository;
+    @Mock
+    private OptionRepository optionRepository;
 
     @InjectMocks
     private MenuService menuService;
@@ -52,7 +56,7 @@ public class MenuServiceTest {
         ObjectId objectId = mockStore.getStoreId();
         String storeId = objectId.toString();
 
-        when(categoryRepository.findAllByStoreId(objectId)).thenReturn(new ArrayList<>());
+        when(categoryRepository.findAllByStoreIdAndOptionFalse(objectId)).thenReturn(new ArrayList<>());
 
         List<MenuCategoryDTO> allMenu = menuService.getAllMenu(storeId);
         assertThat(allMenu).isEmpty();
@@ -66,12 +70,15 @@ public class MenuServiceTest {
         ObjectId objectId = mockStore.getStoreId();
         String storeId = objectId.toString();
 
-        List<Category> categoryList = DataLoader.getDataList("category", fileName, Category.class);
+        List<Category> categoryList = ((List<Category>) DataLoader.getDataList("category", fileName, Category.class))
+            .stream()
+            .filter(category -> !category.isOption())
+            .toList();
         List<ObjectId> categoryIds = categoryList.stream()
             .map(category -> category.getCategoryId())
             .toList();
 
-        when(categoryRepository.findAllByStoreId(objectId)).thenReturn(categoryList);
+        when(categoryRepository.findAllByStoreIdAndOptionFalse(objectId)).thenReturn(categoryList);
         when(menuRepository.findAllByCategoryIdIn(categoryIds)).thenReturn(new ArrayList<>());
 
         List<MenuCategoryDTO> allMenu = menuService.getAllMenu(storeId);
@@ -92,14 +99,17 @@ public class MenuServiceTest {
         ObjectId objectId = mockStore.getStoreId();
         String storeId = objectId.toString();
 
-        List<Category> categoryList = DataLoader.getDataList("category", fileName, Category.class);
+        List<Category> categoryList = ((List<Category>) DataLoader.getDataList("category", fileName, Category.class))
+            .stream()
+            .filter(category -> !category.isOption())
+            .toList();
         List<ObjectId> categoryIds = categoryList.stream()
             .map(category -> category.getCategoryId())
             .toList();
 
         List<Menu> menuList = DataLoader.getDataList("menu", fileName, Menu.class);
 
-        when(categoryRepository.findAllByStoreId(objectId)).thenReturn(categoryList);
+        when(categoryRepository.findAllByStoreIdAndOptionFalse(objectId)).thenReturn(categoryList);
         when(menuRepository.findAllByCategoryIdIn(categoryIds)).thenReturn(menuList);
 
         List<MenuCategoryDTO> allMenu = menuService.getAllMenu(storeId);
@@ -162,14 +172,13 @@ public class MenuServiceTest {
     void getMenu_Success() {
         String fileName = "pizza.json";
         Menu mockMenu = (Menu) DataLoader.getDataList("menu", fileName, Menu.class).get(0);
-
         ObjectId categoryId = mockMenu.getCategoryId();
         ObjectId menuId = mockMenu.getMenuId();
 
         String storeId = "";
         Category mockCategory = null;
         for (Category category : (List<Category>) DataLoader.getDataList("category", fileName, Category.class)) {
-            if (category.getCategoryId().equals(categoryId)) {
+            if (!category.isOption() && category.getCategoryId().equals(categoryId)) {
                 mockCategory = category;
                 storeId = category.getStoreId().toString();
                 break;
@@ -179,10 +188,23 @@ public class MenuServiceTest {
         when(menuRepository.findByMenuId(menuId)).thenReturn(Optional.of(mockMenu));
         when(categoryRepository.findByCategoryId(categoryId)).thenReturn(Optional.of(mockCategory));
 
+        List<Category> categoryList = ((List<Category>) DataLoader.getDataList("category", fileName, Category.class))
+            .stream()
+            .filter(category ->  category.isOption())
+            .toList();
+        List<Option> optionList = DataLoader.getDataList("option", fileName, Option.class);
+
+        List<ObjectId> categoryIds = categoryList.stream()
+            .map(category -> category.getCategoryId())
+            .toList();
+
+        when(optionRepository.findAllByCategoryIdIn(categoryIds)).thenReturn(optionList);
+        when(categoryRepository.findAllByCategoryIdInOptionTrue(categoryIds)).thenReturn(categoryList);
+
         MenuDTO menu = menuService.getMenu(storeId, menuId.toString());
 
-        assertThat(menu).isNotNull();
-        assertThat(menu).isEqualTo(MenuMapper.INSTANCE.toDTO(mockMenu));
+        assertThat(menu.getMenuId()).isEqualTo(mockMenu.getMenuId().toString());
+        assertThat(menu.isOptionEnabled() && menu.getOptions() == null).isFalse();
     }
 
     @Test

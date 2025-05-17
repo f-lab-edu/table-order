@@ -5,9 +5,12 @@ import com.flab.tableorder.domain.Category;
 import com.flab.tableorder.domain.CategoryRepository;
 import com.flab.tableorder.domain.Menu;
 import com.flab.tableorder.domain.MenuRepository;
+import com.flab.tableorder.domain.Option;
+import com.flab.tableorder.domain.OptionRepository;
 import com.flab.tableorder.dto.CallDTO;
 import com.flab.tableorder.dto.MenuCategoryDTO;
 import com.flab.tableorder.dto.MenuDTO;
+import com.flab.tableorder.dto.OptionDTO;
 import com.flab.tableorder.exception.MenuNotFoundException;
 import com.flab.tableorder.exception.StoreNotFoundException;
 import com.flab.tableorder.mapper.CallMapper;
@@ -21,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.flab.tableorder.mapper.OptionMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,13 +36,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 public class MenuService {
+    private final CallRepository callRepository;
     private final CategoryRepository categoryRepository;
     private final MenuRepository menuRepository;
-    private final CallRepository callRepository;
+    private final OptionRepository optionRepository;
 
     @Transactional(readOnly = true)
     public List<MenuCategoryDTO> getAllMenu(String storeId) {
-        List<Category> categoryList = categoryRepository.findAllByStoreId(new ObjectId(storeId));
+        List<Category> categoryList = categoryRepository.findAllByStoreIdAndOptionFalse(new ObjectId(storeId));
         if (categoryList.isEmpty()) return new ArrayList<>();
 
         List<ObjectId> categoryIds = categoryList.stream()
@@ -55,7 +60,7 @@ public class MenuService {
             .map(menuCategoryDTO -> {
                 List<MenuDTO> menus = Optional.ofNullable(menuListMap.get(menuCategoryDTO.getCategoryId()))
                     .map(menu -> MenuMapper.INSTANCE.toDTO(menu))
-                    .orElseGet(() -> new ArrayList());
+                    .orElseGet(() -> List.of());
 
                 menuCategoryDTO.setMenu(menus);
                 return menuCategoryDTO;
@@ -77,7 +82,29 @@ public class MenuService {
 
         if (!findStoreId.equals(storeId)) throw new StoreNotFoundException("Store mismatch: expected " + findStoreId + ", but got " + storeId);
 
-        return MenuMapper.INSTANCE.toDTO(menu);
+        MenuDTO returnMenu = MenuMapper.INSTANCE.toDTO(menu);
+        if (menu.isOptionEnabled()) {
+            List<ObjectId> categoryIds = Optional.ofNullable(menu.getOptionCategoryIds())
+                .filter(optionCategoryIds -> !optionCategoryIds.isEmpty())
+                .orElse(List.of());
+
+            Map<String, List<Option>> optionListMap = optionRepository.findAllByCategoryIdIn(categoryIds)
+                .stream().collect(Collectors.groupingBy(option -> option.getCategoryId().toString()));
+
+            returnMenu.setOptions(CategoryMapper.INSTANCE.toOptionDTO(categoryRepository.findAllByCategoryIdInOptionTrue(categoryIds))
+                .stream()
+                .map(categoryDTO -> {
+                    List<OptionDTO> options = Optional.ofNullable(optionListMap.get(categoryDTO.getCategoryId()))
+                        .map(option -> OptionMapper.INSTANCE.toDTO(option))
+                        .orElseGet(() -> List.of());
+
+                    categoryDTO.setOptions(options);
+                    return categoryDTO;
+                })
+                .toList());
+        }
+
+        return returnMenu;
     }
 
     @Transactional(readOnly = true)
