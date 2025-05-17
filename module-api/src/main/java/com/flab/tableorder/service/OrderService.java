@@ -82,6 +82,5 @@ public class OrderService {
         }
         
 //        TODO: 주문 수량과 가격을 redis에 저장
-//        TODO: 주문 내역을 DB에 저장
     }
 }
