@@ -25,8 +25,6 @@ import java.util.stream.Collectors;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractControllerTest {
-    private static boolean initialized = false;
-
     @LocalServerPort
     private int port;
 
@@ -42,9 +40,6 @@ public abstract class AbstractControllerTest {
 
     @BeforeAll
     void init() {
-        if (initialized) return;
-
-        this.initialized = true;
         this.url = "http://localhost:" + port;
         String fileName = "pizza.json";
         this.store = DataLoader.getDataInfo("store", fileName, Store.class);
