@@ -1,6 +1,8 @@
 package com.flab.tableorder.service;
 
 import com.flab.tableorder.DataLoader;
+import com.flab.tableorder.domain.Call;
+import com.flab.tableorder.domain.CallRepository;
 import com.flab.tableorder.domain.Menu;
 import com.flab.tableorder.domain.MenuRepository;
 import com.flab.tableorder.domain.Option;
@@ -27,6 +29,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceTest {
     @Mock
+    private CallRepository callRepository;
+    @Mock
     private MenuRepository menuRepository;
     @Mock
     private OptionRepository optionRepository;
@@ -36,8 +40,7 @@ public class OrderServiceTest {
     @Test
     void order_NotFound_Menu() {
         Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
-        ObjectId objectId = mockStore.getStoreId();
-        String storeId = objectId.toString();
+        String storeId = mockStore.getStoreId().toString();
 
         OrderDTO orderDTO = new OrderDTO();
         orderDTO.setMenuId("681edb5be8f2f34d23ecf6b0");
@@ -54,8 +57,7 @@ public class OrderServiceTest {
     @Test
     void order_NotMatch_Menu_price() {
         Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
-        ObjectId objectId = mockStore.getStoreId();
-        String storeId = objectId.toString();
+        String storeId = mockStore.getStoreId().toString();
 
         String menuId = "681edb5be8f2f34d23ecf6b0";
 
@@ -78,8 +80,7 @@ public class OrderServiceTest {
     @Test
     void order_NotMatch_Option_size() {
         Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
-        ObjectId objectId = mockStore.getStoreId();
-        String storeId = objectId.toString();
+        String storeId = mockStore.getStoreId().toString();
 
         String menuId = "681edb5be8f2f34d23ecf6b0";
 
@@ -117,8 +118,7 @@ public class OrderServiceTest {
     @Test
     void order_NotMatch_Option_price() {
         Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
-        ObjectId objectId = mockStore.getStoreId();
-        String storeId = objectId.toString();
+        String storeId = mockStore.getStoreId().toString();
 
         String menuId = "681edb5be8f2f34d23ecf6b0";
         String optionId = "681edb5be8f2f34d23ecf6b1";
@@ -162,8 +162,7 @@ public class OrderServiceTest {
     @Test
     void order_Success() {
         Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
-        ObjectId objectId = mockStore.getStoreId();
-        String storeId = objectId.toString();
+        String storeId = mockStore.getStoreId().toString();
 
         String menuId = "681edb5be8f2f34d23ecf6b0";
         String optionId = "681edb5be8f2f34d23ecf6b1";
@@ -200,5 +199,38 @@ public class OrderServiceTest {
         when(optionRepository.findAllByOptionIdIn(optionIds)).thenReturn(List.of(option));
 
         assertDoesNotThrow(() -> orderService.orderMenu(orderList, storeId, ""));
+    }
+
+    @Test
+    void call_NotMatch_call_size() {
+        Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
+        ObjectId objectId = mockStore.getStoreId();
+        String storeId = objectId.toString();
+        String callId = "681edb5be8f2f34d23ecf6b9";
+
+        when(callRepository.findAllByCallIdInAndStoreId(
+            List.of(new ObjectId(callId)),
+            objectId
+        )).thenReturn(List.of());
+
+        assertThatThrownBy(() -> orderService.orderCall(List.of(callId), storeId, ""))
+            .isInstanceOf(MenuNotFoundException.class)
+            .hasMessage("Attempted to order a call item that does not exist.");
+    }
+
+    @Test
+    void call_Success() {
+        Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
+        ObjectId objectId = mockStore.getStoreId();
+        String storeId = objectId.toString();
+
+        Call call = (Call) DataLoader.getDataList("call", "pizza.json", Call.class).get(0);
+
+        when(callRepository.findAllByCallIdInAndStoreId(
+            List.of(call.getCallId()),
+            objectId
+        )).thenReturn(List.of(call));
+
+        assertDoesNotThrow(() -> orderService.orderCall(List.of(call.getCallId().toString()), storeId, ""));
     }
 }

@@ -32,7 +32,8 @@ public class OrderController {
     }
 
     @PostMapping("/table/{tableId}/call")
-    public ResponseEntity<ResponseDTO> postCall(@RequestBody Map<String, List<Long>> requestData) {
+    public ResponseEntity<ResponseDTO> postCall(@RequestBody List<String> requestData, @PathVariable String tableId) {
+        orderService.orderCall(requestData, StoreContext.getStoreId(), tableId);
         ResponseDTO responseData = new ResponseDTO<>(200, "");
 
         return ResponseEntity.ok(responseData);

@@ -1,5 +1,7 @@
 package com.flab.tableorder.service;
 
+import com.flab.tableorder.domain.Call;
+import com.flab.tableorder.domain.CallRepository;
 import com.flab.tableorder.domain.Menu;
 import com.flab.tableorder.domain.MenuRepository;
 import com.flab.tableorder.domain.Option;
@@ -12,7 +14,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import com.flab.tableorder.exception.MenuNotFoundException;
@@ -28,8 +29,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 public class OrderService {
+    private final CallRepository callRepository;
     private final MenuRepository menuRepository;
     private final OptionRepository optionRepository;
+
     @Transactional(readOnly = true)
     public void orderMenu(List<OrderDTO> orderList, String storeId, String tableId) {
         List<ObjectId> menuIds = new ArrayList<>();
@@ -64,9 +67,10 @@ public class OrderService {
             throw new MenuNotFoundException("Not found order a menu");
 
         for (Menu menu : menuList) {
-            if (menu.getPrice() != menuPriceMap.get(menu.getMenuId()))
+            ObjectId menuId = menu.getMenuId();
+            if (menu.getPrice() != menuPriceMap.get(menuId))
                 throw new PriceNotMatchedException("Menu price does not match.",
-                    menuPriceMap.get(menu.getMenuId()),
+                    menuPriceMap.get(menuId),
                     menu.getPrice());
         }
 
@@ -75,12 +79,30 @@ public class OrderService {
             throw new MenuNotFoundException("Attempted to order a option item that does not exist.");
 
         for (Option option : optionList) {
-            if (option.getPrice() != optionPriceMap.get(option.getOptionId()))
+            ObjectId optionId = option.getOptionId();
+
+            if (option.getPrice() != optionPriceMap.get(optionId))
                 throw new PriceNotMatchedException("Option price does not match.",
-                    optionPriceMap.get(option.getOptionId()),
+                    optionPriceMap.get(optionId),
                     option.getPrice());
         }
         
 //        TODO: 주문 수량과 가격을 redis에 저장
+//        TODO: POS기로 주문 정보 전송
+    }
+
+    @Transactional
+    public void orderCall(List<String> callList, String storeId, String tableId) {
+        List<Call> findCallList = callRepository.findAllByCallIdInAndStoreId(
+            callList.stream()
+                .map(str -> new ObjectId(str))
+                .toList(),
+            new ObjectId(storeId));
+
+        if (findCallList.size() != callList.size())
+            throw new MenuNotFoundException("Attempted to order a call item that does not exist.");
+
+//        TODO: POS기로 주문 정보 전송
+
     }
 }
