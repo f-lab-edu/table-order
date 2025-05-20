@@ -11,17 +11,18 @@ import com.flab.tableorder.dto.CallDTO;
 import com.flab.tableorder.dto.MenuCategoryDTO;
 import com.flab.tableorder.dto.MenuDTO;
 import com.flab.tableorder.dto.OptionDTO;
+import com.flab.tableorder.dto.StoreDTO;
 import com.flab.tableorder.exception.MenuNotFoundException;
 import com.flab.tableorder.exception.StoreNotFoundException;
 import com.flab.tableorder.mapper.CallMapper;
 import com.flab.tableorder.mapper.CategoryMapper;
 import com.flab.tableorder.mapper.MenuMapper;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.flab.tableorder.mapper.OptionMapper;
@@ -29,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.bson.types.ObjectId;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,9 +42,19 @@ public class MenuService {
     private final CategoryRepository categoryRepository;
     private final MenuRepository menuRepository;
     private final OptionRepository optionRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    private static final String CACHE_PREFIX = "store:";
 
     @Transactional(readOnly = true)
     public List<MenuCategoryDTO> getAllMenu(String storeId) {
+        String key = CACHE_PREFIX + storeId;
+
+        StoreDTO cached = (StoreDTO) redisTemplate.opsForValue().get(key);
+        if (cached != null) return cached.getCategories();
+
+        log.info("캐시에 데이터 없음... DB 조회");
+
         List<Category> categoryList = categoryRepository.findAllByStoreIdAndOptionFalse(new ObjectId(storeId));
         if (categoryList.isEmpty()) return List.of();
 
@@ -56,7 +68,7 @@ public class MenuService {
             : menuList.stream()
                 .collect(Collectors.groupingBy(menu -> menu.getCategoryId().toString()));
 
-        return CategoryMapper.INSTANCE.toDTO(categoryList).stream()
+        List<MenuCategoryDTO> result = CategoryMapper.INSTANCE.toDTO(categoryList).stream()
             .map(menuCategoryDTO -> {
                 List<MenuDTO> menus = Optional.ofNullable(menuListMap.get(menuCategoryDTO.getCategoryId()))
                     .map(menu -> MenuMapper.INSTANCE.toDTO(menu))
@@ -66,6 +78,12 @@ public class MenuService {
                 return menuCategoryDTO;
             })
             .toList();
+
+        StoreDTO redisStore = new StoreDTO();
+        redisStore.setCategories(result);
+        redisTemplate.opsForValue().set(key, redisStore, 6, TimeUnit.HOURS);
+
+        return result;
     }
 
     @Transactional(readOnly = true)

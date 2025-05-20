@@ -1,11 +1,13 @@
 package com.flab.tableorder.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.tableorder.DataLoader;
 import com.flab.tableorder.domain.CallRepository;
 import com.flab.tableorder.domain.CategoryRepository;
 import com.flab.tableorder.domain.MenuRepository;
 import com.flab.tableorder.domain.Menu;
 import com.flab.tableorder.domain.OptionRepository;
+import com.flab.tableorder.domain.Store;
 import com.flab.tableorder.domain.StoreRepository;
 import com.flab.tableorder.dto.MenuCategoryDTO;
 import com.flab.tableorder.dto.MenuDTO;
@@ -14,6 +16,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 
+import com.flab.tableorder.dto.StoreDTO;
 import com.flab.tableorder.service.StoreService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,6 +29,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -39,6 +43,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MenuControllerTests extends AbstractControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
     @Value("${db.data.init}")
     private String isInit;
     @Value("${db.data.clear.storeId}")
@@ -82,15 +89,8 @@ class MenuControllerTests extends AbstractControllerTest {
         if (this.callList != null) callRepository.saveAll(callList);
     }
 
-    @Test
-    void getAllMenu_Success() {
-        Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url + "/menu", HttpMethod.GET, this.httpEntity);
-
-        assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
-
+    void diffAllMenu(List<Map<String, Object>> resMenuCategoryList) {
         List<MenuCategoryDTO> storeMenuCategoryList = this.storeDTO.getCategories();
-        List<Map<String, Object>> resMenuCategoryList = (List<Map<String, Object>>) responseData.get("data");
-
         assertThat(resMenuCategoryList.size()).isEqualTo(storeMenuCategoryList.size());
 
         for (int i = 0; i < storeMenuCategoryList.size(); i++) {
@@ -119,7 +119,26 @@ class MenuControllerTests extends AbstractControllerTest {
                 assertThat(price).isGreaterThan(salePrice);
             }
         }
+    }
+    @Test
+    void getAllMenu_Success() {
+        Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url + "/menu", HttpMethod.GET, this.httpEntity);
 
+        assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
+
+        diffAllMenu((List<Map<String, Object>>) responseData.get("data"));
+    }
+
+    @Test
+    void getAllMenu_Redis() {
+        Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
+        String storeId = mockStore.getStoreId().toString();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        diffAllMenu(((StoreDTO) redisTemplate.opsForValue().get("store:" + storeId)).getCategories()
+            .stream()
+            .map(category -> (Map<String, Object>) objectMapper.convertValue(category, Map.class))
+            .toList());
     }
 
      @Test
