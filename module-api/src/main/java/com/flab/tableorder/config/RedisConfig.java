@@ -1,31 +1,31 @@
 package com.flab.tableorder.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import lombok.Setter;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
+@ConfigurationProperties(prefix = "spring.redis")
+@Setter
 public class RedisConfig {
-    @Value("${spring.redis.host}")
     private String host;
-
-    @Value("${spring.redis.port}")
     private int port;
-
-    @Value("${spring.redis.username}")
-    private String uername;
-
-    @Value("${spring.redis.password}")
+    private String username;
     private String password;
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
-        config.setUsername(uername); // Redis 6+의 기본 사용자
+        config.setUsername(username);
         config.setPassword(RedisPassword.of(password));
         return new LettuceConnectionFactory(config);
     }
-}
+
