@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.flab.tableorder.exception.MenuNotFoundException;
 import com.flab.tableorder.exception.PriceNotMatchedException;
@@ -35,59 +36,70 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public void orderMenu(List<OrderDTO> orderList, String storeId, String tableId) {
-        List<ObjectId> menuIds = new ArrayList<>();
-        Map<ObjectId, Integer> menuPriceMap = new HashMap<>();
-        List<ObjectId> optionIds = new ArrayList<>();
-        Map<ObjectId, Integer> optionPriceMap = new HashMap<>();
+        List<ObjectId> menuIds = orderList.stream()
+            .map(orderDTO -> new ObjectId(orderDTO.getMenuId()))
+            .toList();
 
-        int totalPrice = 0;
-        for (OrderDTO orderDTO : orderList) {
-            ObjectId objMenuId = new ObjectId(orderDTO.getMenuId());
-            int menuPrice = orderDTO.getPrice();
+        Map<ObjectId, Integer> menuPriceMap = orderList.stream()
+            .collect(Collectors.toMap(
+                orderDTO -> new ObjectId(orderDTO.getMenuId()),
+                orderDTO -> orderDTO.getPrice()
+            ));
 
-            menuIds.add(objMenuId);
-            menuPriceMap.put(objMenuId, menuPrice);
-            totalPrice += menuPrice * orderDTO.getQuantity();
+        List<ObjectId> optionIds = orderList.stream()
+            .flatMap(orderDTO -> Optional.ofNullable(orderDTO.getOptions())
+                .orElse(Collections.emptyList())
+                .stream())
+            .map(optionDTO -> new ObjectId(optionDTO.getOptionId()))
+            .distinct()
+            .toList();
 
-            List<OptionDTO> optionList = Optional.ofNullable(orderDTO.getOptions())
-                .orElse(Collections.emptyList());
-            for (OptionDTO optionDTO : optionList) {
-                ObjectId objOptionId = new ObjectId(optionDTO.getOptionId());
-                int optionPrice = optionDTO.getPrice();
-
-                optionIds.add(objOptionId);
-                optionPriceMap.put(objOptionId, optionPrice);
-                totalPrice += optionPrice * optionDTO.getQuantity();
-            }
-        }
-        optionIds = optionIds.stream().distinct().toList();
+        Map<ObjectId, Integer> optionPriceMap = orderList.stream()
+            .flatMap(orderDTO -> Optional.ofNullable(orderDTO.getOptions())
+                .orElse(Collections.emptyList())
+                .stream())
+            .collect(Collectors.toMap(
+                optionDTO -> new ObjectId(optionDTO.getOptionId()),
+                optionDTO -> optionDTO.getPrice()
+            ));
 
         List<Menu> menuList = menuRepository.findAllByMenuIdIn(menuIds);
         if (menuList.size() != menuIds.size())
             throw new MenuNotFoundException("Not found order a menu");
 
-        for (Menu menu : menuList) {
-            ObjectId menuId = menu.getMenuId();
-            if (menu.getPrice() != menuPriceMap.get(menuId))
+        menuList.stream()
+            .filter(menu -> menu.getPrice() != menuPriceMap.get(menu.getMenuId()))
+            .findFirst()
+            .ifPresent(menu -> {
                 throw new PriceNotMatchedException("Menu price does not match.",
-                    menuPriceMap.get(menuId),
+                    menuPriceMap.get(menu.getMenuId()),
                     menu.getPrice());
-        }
+            });
 
         List<Option> optionList = optionRepository.findAllByOptionIdIn(optionIds);
         if (optionList.size() != optionIds.size())
             throw new MenuNotFoundException("Attempted to order a option item that does not exist.");
 
-        for (Option option : optionList) {
-            ObjectId optionId = option.getOptionId();
-
-            if (option.getPrice() != optionPriceMap.get(optionId))
+        optionList.stream()
+            .filter(option -> option.getPrice() != optionPriceMap.get(option.getOptionId()))
+            .findFirst()
+            .ifPresent(option -> {
                 throw new PriceNotMatchedException("Option price does not match.",
-                    optionPriceMap.get(optionId),
+                    optionPriceMap.get(option.getOptionId()),
                     option.getPrice());
-        }
+            });
         
 //        TODO: 주문 수량과 가격을 redis에 저장
+        int totalPrice = orderList.stream()
+            .mapToInt(orderDTO -> orderDTO.getPrice() * orderDTO.getQuantity() +
+                Optional.ofNullable(orderDTO.getOptions())
+                    .orElse(Collections.emptyList())
+                    .stream()
+                    .mapToInt(optionDTO -> optionDTO.getPrice() * optionDTO.getQuantity())
+                    .sum()
+
+            )
+            .sum();
 //        TODO: POS기로 주문 정보 전송
     }
 
