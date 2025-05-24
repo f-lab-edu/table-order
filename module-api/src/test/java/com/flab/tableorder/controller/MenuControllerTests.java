@@ -129,18 +129,6 @@ class MenuControllerTests extends AbstractControllerTest {
         diffAllMenu((List<Map<String, Object>>) responseData.get("data"));
     }
 
-    @Test
-    void getAllMenu_Redis() {
-        Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
-        String storeId = mockStore.getStoreId().toString();
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        diffAllMenu(((StoreDTO) redisTemplate.opsForValue().get("store:" + storeId)).getCategories()
-            .stream()
-            .map(category -> (Map<String, Object>) objectMapper.convertValue(category, Map.class))
-            .toList());
-    }
-
      @Test
      void getMenu_Success() {
          Menu storeMenu = this.menuList.get(0);
@@ -169,5 +157,17 @@ class MenuControllerTests extends AbstractControllerTest {
              assertThat(resCallList.get(i).get("callName")).isEqualTo(this.callList.get(i).getCallName());
          }
      }
+
+    @Test
+    void getAllMenu_Redis() {
+        Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
+        String storeId = mockStore.getStoreId().toString();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        diffAllMenu(((StoreDTO) redisTemplate.opsForValue().get("store:" + storeId)).getCategories()
+            .stream()
+            .map(category -> (Map<String, Object>) objectMapper.convertValue(category, Map.class))
+            .toList());
+    }
 
 }
