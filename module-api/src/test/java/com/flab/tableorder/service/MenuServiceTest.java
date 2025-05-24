@@ -30,6 +30,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -38,6 +40,10 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class MenuServiceTest {
+    @Mock
+    private RedisTemplate redisTemplate;
+    @Mock
+    private ValueOperations<String, Object> valueOperations;
     @Mock
     private MenuRepository menuRepository;
     @Mock
@@ -56,6 +62,7 @@ public class MenuServiceTest {
         ObjectId objectId = mockStore.getStoreId();
         String storeId = objectId.toString();
 
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(categoryRepository.findAllByStoreIdAndOptionFalse(objectId)).thenReturn(List.of());
 
         List<MenuCategoryDTO> allMenu = menuService.getAllMenu(storeId);
@@ -78,6 +85,7 @@ public class MenuServiceTest {
             .map(category -> category.getCategoryId())
             .toList();
 
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(categoryRepository.findAllByStoreIdAndOptionFalse(objectId)).thenReturn(categoryList);
         when(menuRepository.findAllByCategoryIdIn(categoryIds)).thenReturn(List.of());
 
@@ -109,6 +117,7 @@ public class MenuServiceTest {
 
         List<Menu> menuList = DataLoader.getDataList("menu", fileName, Menu.class);
 
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(categoryRepository.findAllByStoreIdAndOptionFalse(objectId)).thenReturn(categoryList);
         when(menuRepository.findAllByCategoryIdIn(categoryIds)).thenReturn(menuList);
 
