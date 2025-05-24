@@ -211,39 +211,36 @@ Authorization: Bearer {apiKey}
 - API : POST /order/table/{tableId}
 - Request 
     ```json
-    {      
-        // API 호출 되기 전에 데이터가 바뀔 수도 있어서 고객이 화면에서 결제할 당시 금액으로  
-        "menu" : [
-            {
-                "menuId" : 2,
-                "quantity" : 1,
-                "price" : 8500,
-                "options" : [
-                    {
-                        "optionId" : 1,
-                        "quantity" : 1,
-                        "price" : 1000
-                    },
-                    {
-                        "optionId" : 2,
-                        "quantity" : 2,
-                        "price" : 1000
-                    },
-                    {
-                        "optionId" : 4,
-                        "quantity" : 1,
-                        "price" : 4000
-                    }
-                ]
-            },
-            {
-                "menuId" : 3,
-                "quantity" : 2,
-                "options" : [],
-                "price" : 4000
-            }
-        ]
-    }
+    [
+        {
+            "menuId" : 2,
+            "quantity" : 1,
+            "price" : 8500,
+            "options" : [
+                {
+                    "optionId" : 1,
+                    "quantity" : 1,
+                    "price" : 1000
+                },
+                {
+                    "optionId" : 2,
+                    "quantity" : 2,
+                    "price" : 1000
+                },
+                {
+                    "optionId" : 4,
+                    "quantity" : 1,
+                    "price" : 4000
+                }
+            ]
+        },
+        {
+            "menuId" : 3,
+            "quantity" : 2,
+            "options" : [],
+            "price" : 4000
+        }
+    ]
     ```
 - Response
     ```json

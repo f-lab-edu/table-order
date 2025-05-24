@@ -6,6 +6,7 @@
         "image" : "https://image.table-order.com/1_1.jpg",
         "soldOut" : false,
         "optionEnabled" : true,
+        "optionCategoryIds" : ["6828137c2bf5c68cba99dc17", "682813ba2bf5c68cba99dc18"],
         "tags" : ["BEST"],
         "categoryId" : "681edb5be8f2f34d23ecf6b2"
     },
@@ -17,6 +18,7 @@
         "image" : "https://image.table-order.com/1_2.jpg",
         "soldOut" : false,
         "optionEnabled" : true,
+        "optionCategoryIds" : ["6828137c2bf5c68cba99dc17", "682813ba2bf5c68cba99dc18"],
         "tags" : ["NEW"],
         "categoryId" : "681edb5be8f2f34d23ecf6b2"
     },

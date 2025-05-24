@@ -1,13 +1,14 @@
 package com.flab.tableorder.domain;
 
-import java.util.Optional;
-
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
-public interface StoreRepository extends MongoRepository<Store, ObjectId> {
+public interface CallRepository extends MongoRepository<Call, ObjectId> {
     void deleteAllByStoreId(ObjectId storeId);
-    Optional<Store> findByApiKey(String apiKey);
+    List<Call> findAllByStoreId(ObjectId storeId);
+    List<Call> findAllByCallIdInAndStoreId(List<ObjectId> callIds, ObjectId storeId);
 }

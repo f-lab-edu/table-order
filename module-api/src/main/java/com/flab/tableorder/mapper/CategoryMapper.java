@@ -5,6 +5,7 @@ import com.flab.tableorder.dto.MenuCategoryDTO;
 
 import java.util.List;
 
+import com.flab.tableorder.dto.OptionCategoryDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -16,4 +17,6 @@ public interface CategoryMapper {
 
     @Mapping(source = "categoryId", target = "categoryId")
     List<MenuCategoryDTO> toDTO(List<Category> menuCategories);
+    @Mapping(source = "categoryId", target = "categoryId")
+    List<OptionCategoryDTO> toOptionDTO(List<Category> optionCategories);
 }

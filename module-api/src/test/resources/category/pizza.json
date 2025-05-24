@@ -14,5 +14,23 @@
         "required" : false,
         "maxSelect" : 0,
         "storeId" : "681edb5be8f2f34d23ecf6b1"
+    },
+    {
+        "categoryId": "6828137c2bf5c68cba99dc17",
+        "categoryName": "토핑",
+        "multiple": true,
+        "required": false,
+        "maxSelect": 0,
+        "option": true,
+        "storeId" : "681edb5be8f2f34d23ecf6b1"
+    },
+    {
+        "categoryId" : "682813ba2bf5c68cba99dc18",
+        "categoryName" : "엣지",
+        "multiple" : false,
+        "required" : false,
+        "maxSelect" : 0,
+        "option": true,
+        "storeId" : "681edb5be8f2f34d23ecf6b1"
     }
 ]
