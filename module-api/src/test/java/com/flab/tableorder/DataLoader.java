@@ -47,11 +47,11 @@ public class DataLoader {
         return data;
     }
 
-    public static <T> T getDataInfo(String dir, String fileName, Class cls) {
+    public static <T> T getDataInfo(String dir, String fileName, Class<T> cls) {
         return getDataFromStream(dir, fileName, objectMapper.constructType(cls));
     }
 
-    public static List getDataList(String dir, String fileName, Class cls) {
+    public static <T> List<T> getDataList(String dir, String fileName, Class<T> cls) {
         return getDataFromStream(dir, fileName, objectMapper.getTypeFactory()
             .constructCollectionType(List.class, cls));
     }

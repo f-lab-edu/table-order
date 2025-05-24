@@ -21,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -28,6 +29,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceTest {
+    @Mock
+    private RedisTemplate redisTemplate;
     @Mock
     private CallRepository callRepository;
     @Mock
@@ -224,7 +227,7 @@ public class OrderServiceTest {
         ObjectId objectId = mockStore.getStoreId();
         String storeId = objectId.toString();
 
-        Call call = (Call) DataLoader.getDataList("call", "pizza.json", Call.class).get(0);
+        Call call = DataLoader.getDataList("call", "pizza.json", Call.class).get(0);
 
         when(callRepository.findAllByCallIdInAndStoreId(
             List.of(call.getCallId()),

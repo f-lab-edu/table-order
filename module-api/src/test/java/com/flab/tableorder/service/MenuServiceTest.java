@@ -70,7 +70,7 @@ public class MenuServiceTest {
         ObjectId objectId = mockStore.getStoreId();
         String storeId = objectId.toString();
 
-        List<Category> categoryList = ((List<Category>) DataLoader.getDataList("category", fileName, Category.class))
+        List<Category> categoryList = DataLoader.getDataList("category", fileName, Category.class)
             .stream()
             .filter(category -> !category.isOption())
             .toList();
@@ -99,7 +99,7 @@ public class MenuServiceTest {
         ObjectId objectId = mockStore.getStoreId();
         String storeId = objectId.toString();
 
-        List<Category> categoryList = ((List<Category>) DataLoader.getDataList("category", fileName, Category.class))
+        List<Category> categoryList = DataLoader.getDataList("category", fileName, Category.class)
             .stream()
             .filter(category -> !category.isOption())
             .toList();
@@ -138,7 +138,7 @@ public class MenuServiceTest {
     @Test
     void getMenu_NotFound_Category() {
         String fileName = "pizza.json";
-        Menu mockMenu = (Menu) DataLoader.getDataList("menu", fileName, Menu.class).get(0);
+        Menu mockMenu = DataLoader.getDataList("menu", fileName, Menu.class).get(0);
 
         ObjectId menuId = mockMenu.getMenuId();
         when(menuRepository.findByMenuId(menuId)).thenReturn(Optional.of(mockMenu));
@@ -153,7 +153,7 @@ public class MenuServiceTest {
     @Test
     void getMenu_Mismatch() {
         String fileName = "pizza.json";
-        Menu mockMenu = (Menu) DataLoader.getDataList("menu", fileName, Menu.class).get(0);
+        Menu mockMenu = DataLoader.getDataList("menu", fileName, Menu.class).get(0);
         Category mockCategory = new Category();
         mockCategory.setCategoryId(mockMenu.getCategoryId());
         mockCategory.setStoreId(new ObjectId("111111111111111111111111"));
@@ -171,13 +171,13 @@ public class MenuServiceTest {
     @Test
     void getMenu_Success() {
         String fileName = "pizza.json";
-        Menu mockMenu = (Menu) DataLoader.getDataList("menu", fileName, Menu.class).get(0);
+        Menu mockMenu = DataLoader.getDataList("menu", fileName, Menu.class).get(0);
         ObjectId categoryId = mockMenu.getCategoryId();
         ObjectId menuId = mockMenu.getMenuId();
 
         String storeId = "";
         Category mockCategory = null;
-        for (Category category : (List<Category>) DataLoader.getDataList("category", fileName, Category.class)) {
+        for (Category category : DataLoader.getDataList("category", fileName, Category.class)) {
             if (!category.isOption() && category.getCategoryId().equals(categoryId)) {
                 mockCategory = category;
                 storeId = category.getStoreId().toString();
@@ -188,7 +188,7 @@ public class MenuServiceTest {
         when(menuRepository.findByMenuId(menuId)).thenReturn(Optional.of(mockMenu));
         when(categoryRepository.findByCategoryId(categoryId)).thenReturn(Optional.of(mockCategory));
 
-        List<Category> categoryList = ((List<Category>) DataLoader.getDataList("category", fileName, Category.class))
+        List<Category> categoryList = DataLoader.getDataList("category", fileName, Category.class)
             .stream()
             .filter(category ->  category.isOption())
             .toList();
