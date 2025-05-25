@@ -1,5 +1,11 @@
 package com.flab.tableorder.config;
 
+import com.flab.tableorder.dto.MenuCategoryDTO;
+import com.flab.tableorder.dto.OrderDTO;
+import com.flab.tableorder.dto.StoreDTO;
+
+import java.util.List;
+
 import lombok.Setter;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -29,16 +35,28 @@ public class RedisConfig {
         return new LettuceConnectionFactory(config);
     }
 
-    @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
+    private <T> RedisTemplate<String, T> getDefaultRedisTemplate(Class<T> cls, RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, T> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
         template.setKeySerializer(new StringRedisSerializer());
-        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer();
-        template.setValueSerializer(serializer);
-        template.setHashValueSerializer(serializer);
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
 
         return template;
+    }
+
+    @Bean
+    public RedisTemplate<String, MenuCategoryDTO> menuRedisTemplate(RedisConnectionFactory connectionFactory) {
+        return getDefaultRedisTemplate(MenuCategoryDTO.class, connectionFactory);
+    }
+
+    @Bean
+    public RedisTemplate<String, OrderDTO> orderRedisTemplate(RedisConnectionFactory connectionFactory) {
+        return getDefaultRedisTemplate(OrderDTO.class, connectionFactory);
+    }
+
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
+        return getDefaultRedisTemplate(Object.class, connectionFactory);
     }
 }

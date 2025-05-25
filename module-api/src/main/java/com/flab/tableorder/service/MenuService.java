@@ -42,7 +42,7 @@ public class MenuService {
     private final CategoryRepository categoryRepository;
     private final MenuRepository menuRepository;
     private final OptionRepository optionRepository;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, MenuCategoryDTO> redisTemplate;
 
     private static final String CACHE_PREFIX = "store:";
 
@@ -50,8 +50,8 @@ public class MenuService {
     public List<MenuCategoryDTO> getAllMenu(String storeId) {
         String key = CACHE_PREFIX + storeId;
 
-        StoreDTO cached = (StoreDTO) redisTemplate.opsForValue().get(key);
-        if (cached != null) return cached.getCategories();
+        List<MenuCategoryDTO> cached = redisTemplate.opsForList().range(key, 0, -1);
+        if (!cached.isEmpty()) return cached;
 
         log.debug("캐시에 데이터 없음... DB 조회");
 
@@ -79,9 +79,8 @@ public class MenuService {
             })
             .toList();
 
-        StoreDTO redisStore = new StoreDTO();
-        redisStore.setCategories(result);
-        redisTemplate.opsForValue().set(key, redisStore, 6, TimeUnit.HOURS);
+        redisTemplate.opsForList().rightPushAll(key, result);
+        redisTemplate.expire(key, 6, TimeUnit.HOURS);
 
         return result;
     }
