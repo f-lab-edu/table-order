@@ -33,7 +33,7 @@ public class OrderService {
     private final CallRepository callRepository;
     private final MenuRepository menuRepository;
     private final OptionRepository optionRepository;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, OrderDTO> redisTemplate;
     private final StringRedisTemplate stringRedisTemplate;
 
     @Transactional(readOnly = true)
@@ -52,7 +52,7 @@ public class OrderService {
             .flatMap(orderDTO -> Optional.ofNullable(orderDTO.getOptions())
                 .orElse(List.of())
                 .stream())
-            .map(optionDTO -> new ObjectId(optionDTO.getOptionId()))
+            .map(orderOptionDTO -> new ObjectId(orderOptionDTO.getOptionId()))
             .distinct()
             .toList();
 
@@ -61,8 +61,8 @@ public class OrderService {
                 .orElse(List.of())
                 .stream())
             .collect(Collectors.toMap(
-                optionDTO -> new ObjectId(optionDTO.getOptionId()),
-                optionDTO -> optionDTO.getPrice()
+                orderOptionDTO -> new ObjectId(orderOptionDTO.getOptionId()),
+                orderOptionDTO -> orderOptionDTO.getPrice()
             ));
 
         List<Menu> menuList = menuRepository.findAllByMenuIdIn(menuIds);

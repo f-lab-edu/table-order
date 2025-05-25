@@ -1,15 +1,14 @@
 package com.flab.tableorder.dto;
 
-import java.util.List;
-
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter @Setter @Data
-public class OrderDTO {
-    private String menuId;
-    private int quantity;
+public class OrderOptionDTO {
+    private String optionId;
+    private int quantity = 0;
     private int price;
-    private List<OrderOptionDTO> options;
 }

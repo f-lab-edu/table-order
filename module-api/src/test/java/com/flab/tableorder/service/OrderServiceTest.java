@@ -11,8 +11,8 @@ import com.flab.tableorder.domain.Store;
 
 import java.util.List;
 
-import com.flab.tableorder.dto.OptionDTO;
 import com.flab.tableorder.dto.OrderDTO;
+import com.flab.tableorder.dto.OrderOptionDTO;
 import com.flab.tableorder.exception.MenuNotFoundException;
 import com.flab.tableorder.exception.PriceNotMatchedException;
 import org.bson.types.ObjectId;
@@ -39,7 +39,7 @@ public class OrderServiceTest {
     @Mock
     private ValueOperations valueOperations;
     @Mock
-    private ListOperations listOperations;
+    private ListOperations<String, Object> listOperations;
     @Mock
     private CallRepository callRepository;
     @Mock
@@ -101,9 +101,9 @@ public class OrderServiceTest {
         orderDTO.setPrice(1000);
         orderDTO.setQuantity(1);
 
-        OptionDTO optionDTO = new OptionDTO();
+        OrderOptionDTO optionDTO = new OrderOptionDTO();
         optionDTO.setOptionId("681edb5be8f2f34d23ecf6b1");
-        List<OptionDTO> optionList = List.of(optionDTO);
+        List<OrderOptionDTO> optionList = List.of(optionDTO);
 
         orderDTO.setOptions(optionList);
 
@@ -141,10 +141,10 @@ public class OrderServiceTest {
         orderDTO.setQuantity(1);
         List<OrderDTO> orderList = List.of(orderDTO);
 
-        OptionDTO optionDTO = new OptionDTO();
+        OrderOptionDTO optionDTO = new OrderOptionDTO();
         optionDTO.setOptionId(optionId);
         optionDTO.setPrice(500);
-        List<OptionDTO> optionList = List.of(optionDTO);
+        List<OrderOptionDTO> optionList = List.of(optionDTO);
 
         orderDTO.setOptions(optionList);
 
@@ -180,10 +180,10 @@ public class OrderServiceTest {
         orderDTO.setPrice(1000);
         orderDTO.setQuantity(1);
 
-        OptionDTO optionDTO = new OptionDTO();
+        OrderOptionDTO optionDTO = new OrderOptionDTO();
         optionDTO.setOptionId(optionId);
         optionDTO.setPrice(500);
-        List<OptionDTO> optionList = List.of(optionDTO);
+        List<OrderOptionDTO> optionList = List.of(optionDTO);
 
         orderDTO.setOptions(optionList);
         return List.of(orderDTO);
@@ -197,7 +197,7 @@ public class OrderServiceTest {
         List<OrderDTO> orderList = getOrderList();
         String menuId = orderList.get(0).getMenuId();
 
-        List<OptionDTO> optionList = orderList.get(0).getOptions();
+        List<OrderOptionDTO> optionList = orderList.get(0).getOptions();
         String optionId = optionList.get(0).getOptionId();
 
         Menu menu = new Menu();

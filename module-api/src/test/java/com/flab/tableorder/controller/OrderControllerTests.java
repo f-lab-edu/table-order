@@ -2,11 +2,11 @@ package com.flab.tableorder.controller;
 
 import com.flab.tableorder.DataLoader;
 import com.flab.tableorder.domain.Menu;
-import com.flab.tableorder.dto.OptionDTO;
 import com.flab.tableorder.dto.OrderDTO;
 
 import java.util.*;
 
+import com.flab.tableorder.dto.OrderOptionDTO;
 import lombok.extern.slf4j.Slf4j;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -48,7 +48,7 @@ class OrderControllerTests extends AbstractControllerTest {
         orderDTO.setOptions(this.optionList.stream()
             .filter(opt -> menu.getOptionCategoryIds().contains(opt.getCategoryId()))
             .map(opt -> {
-                OptionDTO optionDTO = new OptionDTO();
+                OrderOptionDTO optionDTO = new OrderOptionDTO();
                 optionDTO.setOptionId(opt.getOptionId().toString());
                 optionDTO.setPrice(opt.getPrice());
                 optionDTO.setQuantity(1);
