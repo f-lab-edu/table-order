@@ -21,7 +21,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -30,7 +33,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceTest {
     @Mock
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
+    @Mock
+    private StringRedisTemplate stringRedisTemplate;
+    @Mock
+    private ValueOperations valueOperations;
+    @Mock
+    private ListOperations listOperations;
     @Mock
     private CallRepository callRepository;
     @Mock
@@ -52,7 +61,7 @@ public class OrderServiceTest {
 
         when(menuRepository.findAllByMenuIdIn(List.of(new ObjectId(orderDTO.getMenuId())))).thenReturn(List.of());
 
-        assertThatThrownBy(() -> orderService.orderMenu(List.of(orderDTO), storeId, ""))
+        assertThatThrownBy(() -> orderService.orderMenu(List.of(orderDTO), storeId))
             .isInstanceOf(MenuNotFoundException.class)
             .hasMessage("Not found order a menu");
     }
@@ -75,7 +84,7 @@ public class OrderServiceTest {
         when(menuRepository.findAllByMenuIdIn(List.of(new ObjectId(orderDTO.getMenuId()))))
             .thenReturn(List.of(menu));
 
-        assertThatThrownBy(() -> orderService.orderMenu(List.of(orderDTO), storeId, ""))
+        assertThatThrownBy(() -> orderService.orderMenu(List.of(orderDTO), storeId))
             .isInstanceOf(PriceNotMatchedException.class)
             .hasMessageStartingWith("Menu price does not match.");
     }
@@ -113,7 +122,7 @@ public class OrderServiceTest {
             .map(option -> new ObjectId(option.getOptionId()))
             .toList())).thenReturn(List.of());
 
-        assertThatThrownBy(() -> orderService.orderMenu(orderList, storeId, ""))
+        assertThatThrownBy(() -> orderService.orderMenu(orderList, storeId))
             .isInstanceOf(MenuNotFoundException.class)
             .hasMessage("Attempted to order a option item that does not exist.");
     }
@@ -157,16 +166,12 @@ public class OrderServiceTest {
             .toList();
         when(optionRepository.findAllByOptionIdIn(optionIds)).thenReturn(List.of(option));
 
-        assertThatThrownBy(() -> orderService.orderMenu(orderList, storeId, ""))
+        assertThatThrownBy(() -> orderService.orderMenu(orderList, storeId))
             .isInstanceOf(PriceNotMatchedException.class)
             .hasMessageStartingWith("Option price does not match.");
     }
 
-    @Test
-    void order_Success() {
-        Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
-        String storeId = mockStore.getStoreId().toString();
-
+    private List<OrderDTO> getOrderList() {
         String menuId = "681edb5be8f2f34d23ecf6b0";
         String optionId = "681edb5be8f2f34d23ecf6b1";
 
@@ -174,7 +179,6 @@ public class OrderServiceTest {
         orderDTO.setMenuId(menuId);
         orderDTO.setPrice(1000);
         orderDTO.setQuantity(1);
-        List<OrderDTO> orderList = List.of(orderDTO);
 
         OptionDTO optionDTO = new OptionDTO();
         optionDTO.setOptionId(optionId);
@@ -182,6 +186,19 @@ public class OrderServiceTest {
         List<OptionDTO> optionList = List.of(optionDTO);
 
         orderDTO.setOptions(optionList);
+        return List.of(orderDTO);
+    }
+
+    @Test
+    void order_Success() {
+        Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
+        String storeId = mockStore.getStoreId().toString();
+
+        List<OrderDTO> orderList = getOrderList();
+        String menuId = orderList.get(0).getMenuId();
+
+        List<OptionDTO> optionList = orderList.get(0).getOptions();
+        String optionId = optionList.get(0).getOptionId();
 
         Menu menu = new Menu();
         menu.setMenuId(new ObjectId(menuId));
@@ -201,7 +218,19 @@ public class OrderServiceTest {
             .toList();
         when(optionRepository.findAllByOptionIdIn(optionIds)).thenReturn(List.of(option));
 
-        assertDoesNotThrow(() -> orderService.orderMenu(orderList, storeId, ""));
+        assertDoesNotThrow(() -> orderService.orderMenu(orderList, storeId));
+    }
+
+    @Test
+    void updateOrder_Success() {
+        Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
+        String storeId = mockStore.getStoreId().toString();
+        List<OrderDTO> orderList = getOrderList();
+
+        when(redisTemplate.opsForList()).thenReturn(listOperations);
+        when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
+
+        assertDoesNotThrow(() -> orderService.updateOrderList(orderList, storeId, 1));
     }
 
     @Test
@@ -216,7 +245,7 @@ public class OrderServiceTest {
             objectId
         )).thenReturn(List.of());
 
-        assertThatThrownBy(() -> orderService.orderCall(List.of(callId), storeId, ""))
+        assertThatThrownBy(() -> orderService.orderCall(List.of(callId), storeId, 1))
             .isInstanceOf(MenuNotFoundException.class)
             .hasMessage("Attempted to order a call item that does not exist.");
     }
@@ -234,6 +263,6 @@ public class OrderServiceTest {
             objectId
         )).thenReturn(List.of(call));
 
-        assertDoesNotThrow(() -> orderService.orderCall(List.of(call.getCallId().toString()), storeId, ""));
+        assertDoesNotThrow(() -> orderService.orderCall(List.of(call.getCallId().toString()), storeId, 1));
     }
 }

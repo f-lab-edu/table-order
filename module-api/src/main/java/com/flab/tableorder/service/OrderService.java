@@ -9,12 +9,9 @@ import com.flab.tableorder.domain.OptionRepository;
 import com.flab.tableorder.dto.OrderDTO;
 import com.flab.tableorder.dto.OptionDTO;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.flab.tableorder.exception.MenuNotFoundException;
@@ -23,6 +20,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.bson.types.ObjectId;
+import org.hibernate.query.Order;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,9 +33,11 @@ public class OrderService {
     private final CallRepository callRepository;
     private final MenuRepository menuRepository;
     private final OptionRepository optionRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
 
     @Transactional(readOnly = true)
-    public void orderMenu(List<OrderDTO> orderList, String storeId, String tableId) {
+    public void orderMenu(List<OrderDTO> orderList, String storeId) {
         List<ObjectId> menuIds = orderList.stream()
             .map(orderDTO -> new ObjectId(orderDTO.getMenuId()))
             .toList();
@@ -48,7 +50,7 @@ public class OrderService {
 
         List<ObjectId> optionIds = orderList.stream()
             .flatMap(orderDTO -> Optional.ofNullable(orderDTO.getOptions())
-                .orElse(Collections.emptyList())
+                .orElse(List.of())
                 .stream())
             .map(optionDTO -> new ObjectId(optionDTO.getOptionId()))
             .distinct()
@@ -56,7 +58,7 @@ public class OrderService {
 
         Map<ObjectId, Integer> optionPriceMap = orderList.stream()
             .flatMap(orderDTO -> Optional.ofNullable(orderDTO.getOptions())
-                .orElse(Collections.emptyList())
+                .orElse(List.of())
                 .stream())
             .collect(Collectors.toMap(
                 optionDTO -> new ObjectId(optionDTO.getOptionId()),
@@ -88,23 +90,43 @@ public class OrderService {
                     optionPriceMap.get(option.getOptionId()),
                     option.getPrice());
             });
-        
-//        TODO: 주문 수량과 가격을 redis에 저장
-        int totalPrice = orderList.stream()
-            .mapToInt(orderDTO -> orderDTO.getPrice() * orderDTO.getQuantity() +
-                Optional.ofNullable(orderDTO.getOptions())
-                    .orElse(Collections.emptyList())
-                    .stream()
-                    .mapToInt(optionDTO -> optionDTO.getPrice() * optionDTO.getQuantity())
-                    .sum()
 
-            )
-            .sum();
 //        TODO: POS기로 주문 정보 전송
     }
 
     @Transactional
-    public void orderCall(List<String> callList, String storeId, String tableId) {
+    public void updateOrderList(List<OrderDTO> orderList, String storeId, int tableNum) {
+        orderList.stream().forEach(orderDTO -> {
+            redisTemplate.opsForList().rightPush(
+                String.join(":", List.of(
+                    "order",
+                    storeId,
+                    String.valueOf(tableNum))
+                ),
+                orderDTO
+            );
+        });
+
+        stringRedisTemplate.opsForValue().increment(
+            String.join(":", List.of(
+                "totalPrice",
+                LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE),
+                storeId
+            )),
+            orderList.stream()
+                .mapToInt(orderDTO -> orderDTO.getPrice() * orderDTO.getQuantity() +
+                    Optional.ofNullable(orderDTO.getOptions())
+                        .orElse(List.of())
+                        .stream()
+                        .mapToInt(optionDTO -> optionDTO.getPrice() * optionDTO.getQuantity())
+                        .sum()
+
+                )
+                .sum());
+    }
+
+    @Transactional(readOnly = true)
+    public void orderCall(List<String> callList, String storeId, int tableNum) {
         List<Call> findCallList = callRepository.findAllByCallIdInAndStoreId(
             callList.stream()
                 .map(str -> new ObjectId(str))

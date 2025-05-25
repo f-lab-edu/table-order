@@ -5,7 +5,6 @@ import com.flab.tableorder.dto.OrderDTO;
 import com.flab.tableorder.dto.ResponseDTO;
 
 import java.util.List;
-import java.util.Map;
 
 import com.flab.tableorder.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -22,18 +21,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/order")
 public class OrderController {
     private final OrderService orderService;
-    @PostMapping("/table/{tableId}")
-    public ResponseEntity<ResponseDTO> postOrder(@RequestBody List<OrderDTO> requestData, @PathVariable String tableId) {
-        orderService.orderMenu(requestData, StoreContext.getStoreId(), tableId);
+
+    @PostMapping("/table/{tableNum}")
+    public ResponseEntity<ResponseDTO> postOrder(@RequestBody List<OrderDTO> requestData, @PathVariable String tableNum) {
+        orderService.orderMenu(requestData, StoreContext.getStoreId());
+        orderService.updateOrderList(requestData, StoreContext.getStoreId(), Integer.valueOf(tableNum));
 
         ResponseDTO responseData = new ResponseDTO<>(200, "");
 
         return ResponseEntity.ok(responseData);
     }
 
-    @PostMapping("/table/{tableId}/call")
-    public ResponseEntity<ResponseDTO> postCall(@RequestBody List<String> requestData, @PathVariable String tableId) {
-        orderService.orderCall(requestData, StoreContext.getStoreId(), tableId);
+    @PostMapping("/table/{tableNum}/call")
+    public ResponseEntity<ResponseDTO> postCall(@RequestBody List<String> requestData, @PathVariable String tableNum) {
+        orderService.orderCall(requestData, StoreContext.getStoreId(), Integer.parseInt(tableNum));
         ResponseDTO responseData = new ResponseDTO<>(200, "");
 
         return ResponseEntity.ok(responseData);
