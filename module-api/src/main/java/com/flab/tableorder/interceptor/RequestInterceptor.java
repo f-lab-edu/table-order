@@ -9,7 +9,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
 @Slf4j
-public class ResquestInterceptor implements HandlerInterceptor {
+public class RequestInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String method = request.getMethod();
