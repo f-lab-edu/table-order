@@ -27,6 +27,11 @@ public class RedisConfig {
     private int port;
     private String username;
     private String password;
+
+    public static String getRedisKey(String... keys) {
+        return String.join(":", keys);
+    }
+
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);

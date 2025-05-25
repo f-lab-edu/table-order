@@ -1,5 +1,6 @@
 package com.flab.tableorder.service;
 
+import com.flab.tableorder.config.RedisConfig;
 import com.flab.tableorder.domain.Call;
 import com.flab.tableorder.domain.CallRepository;
 import com.flab.tableorder.domain.Menu;
@@ -96,31 +97,23 @@ public class OrderService {
 
     @Transactional
     public void updateOrderList(List<OrderDTO> orderList, String storeId, int tableNum) {
-        orderList.stream().forEach(orderDTO -> {
-            redisTemplate.opsForList().rightPush(
-                String.join(":", List.of(
-                    "order",
-                    storeId,
-                    String.valueOf(tableNum))
-                ),
-                orderDTO
-            );
-        });
+        redisTemplate.opsForList().rightPushAll(
+            RedisConfig.getRedisKey("order", storeId, String.valueOf(tableNum)),
+            orderList);
 
         stringRedisTemplate.opsForValue().increment(
-            String.join(":", List.of(
+            RedisConfig.getRedisKey(
                 "totalPrice",
                 LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE),
                 storeId
-            )),
+            ),
             orderList.stream()
                 .mapToInt(orderDTO -> orderDTO.getPrice() * orderDTO.getQuantity() +
                     Optional.ofNullable(orderDTO.getOptions())
                         .orElse(List.of())
                         .stream()
-                        .mapToInt(optionDTO -> optionDTO.getPrice() * optionDTO.getQuantity())
+                        .mapToInt(orderOptionDTO -> orderOptionDTO.getPrice() * orderOptionDTO.getQuantity())
                         .sum()
-
                 )
                 .sum());
     }

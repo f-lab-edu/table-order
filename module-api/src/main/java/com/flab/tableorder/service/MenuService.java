@@ -1,5 +1,6 @@
 package com.flab.tableorder.service;
 
+import com.flab.tableorder.config.RedisConfig;
 import com.flab.tableorder.domain.CallRepository;
 import com.flab.tableorder.domain.Category;
 import com.flab.tableorder.domain.CategoryRepository;
@@ -48,7 +49,7 @@ public class MenuService {
 
     @Transactional(readOnly = true)
     public List<MenuCategoryDTO> getAllMenu(String storeId) {
-        String key = CACHE_PREFIX + storeId;
+        String key = RedisConfig.getRedisKey("store", storeId);
 
         List<MenuCategoryDTO> cached = redisTemplate.opsForList().range(key, 0, -1);
         if (!cached.isEmpty()) return cached;
