@@ -33,7 +33,7 @@ public class StoreService {
     @Transactional(readOnly = true)
     @Cacheable(value = "storeCache", key = "#apiKey")
     public String getStoreIdByApiKey(String apiKey) {
-        log.info("캐시에 API Key가 존재하지 않음... DB Select");
+        log.debug("캐시에 API Key가 존재하지 않음... DB Select");
 
         Store store = storeRepository.findByApiKey(apiKey)
             .orElseThrow(() -> new StoreNotFoundException("Store not found for API key: " + apiKey));

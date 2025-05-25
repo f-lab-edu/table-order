@@ -53,7 +53,7 @@ public class MenuService {
         StoreDTO cached = (StoreDTO) redisTemplate.opsForValue().get(key);
         if (cached != null) return cached.getCategories();
 
-        log.info("캐시에 데이터 없음... DB 조회");
+        log.debug("캐시에 데이터 없음... DB 조회");
 
         List<Category> categoryList = categoryRepository.findAllByStoreIdAndOptionFalse(new ObjectId(storeId));
         if (categoryList.isEmpty()) return List.of();
