@@ -9,11 +9,7 @@ import java.util.List;
 import com.flab.tableorder.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -23,9 +19,18 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/table/{tableNum}")
-    public ResponseEntity<ResponseDTO> postOrder(@RequestBody List<OrderDTO> requestData, @PathVariable String tableNum) {
+    public ResponseEntity<ResponseDTO> postOrder(@RequestBody List<OrderDTO> requestData, @PathVariable int tableNum) {
         orderService.orderMenu(requestData, StoreContext.getStoreId());
-        orderService.updateOrderList(requestData, StoreContext.getStoreId(), Integer.valueOf(tableNum));
+        orderService.updateOrderList(requestData, StoreContext.getStoreId(), tableNum);
+
+        ResponseDTO responseData = new ResponseDTO<>(200, "");
+
+        return ResponseEntity.ok(responseData);
+    }
+
+    @GetMapping("/table/{tableNum}")
+    public ResponseEntity<ResponseDTO> getOrderList(@PathVariable int tableNum) {
+        orderService.getOrderList(StoreContext.getStoreId(), tableNum);
 
         ResponseDTO responseData = new ResponseDTO<>(200, "");
 

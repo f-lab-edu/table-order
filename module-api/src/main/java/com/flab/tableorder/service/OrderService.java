@@ -118,6 +118,14 @@ public class OrderService {
                 .sum());
     }
 
+    @Transactional
+    public List<OrderDTO> getOrderList(String storeId, int tableNum) {
+        return redisTemplate.opsForList().range(
+            RedisConfig.getRedisKey("order", storeId, String.valueOf(tableNum)),
+            0,
+            -1);
+    }
+
     @Transactional(readOnly = true)
     public void orderCall(List<String> callList, String storeId, int tableNum) {
         List<Call> findCallList = callRepository.findAllByCallIdInAndStoreId(
