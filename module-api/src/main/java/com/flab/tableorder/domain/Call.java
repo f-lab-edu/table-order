@@ -1,26 +1,17 @@
 package com.flab.tableorder.domain;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
-
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document(collection = "category")
+@Document(collection = "call")
 @Getter @Setter
-public class Category {
+public class Call {
     @Id @Field("_id")
-    private ObjectId categoryId;
-
-    private String categoryName;
-    private int maxSelect = 0;
-    private boolean multiple = true;
-    private boolean required = false;
-    private boolean option = false;
-
+    private ObjectId callId;
+    private String callName;
     private ObjectId storeId;
 }

@@ -1,27 +1,37 @@
 package com.flab.tableorder.service;
 
+import com.flab.tableorder.config.RedisConfig;
+import com.flab.tableorder.domain.CallRepository;
 import com.flab.tableorder.domain.Category;
 import com.flab.tableorder.domain.CategoryRepository;
 import com.flab.tableorder.domain.Menu;
 import com.flab.tableorder.domain.MenuRepository;
+import com.flab.tableorder.domain.Option;
+import com.flab.tableorder.domain.OptionRepository;
+import com.flab.tableorder.dto.CallDTO;
 import com.flab.tableorder.dto.MenuCategoryDTO;
 import com.flab.tableorder.dto.MenuDTO;
+import com.flab.tableorder.dto.OptionDTO;
+import com.flab.tableorder.dto.StoreDTO;
 import com.flab.tableorder.exception.MenuNotFoundException;
 import com.flab.tableorder.exception.StoreNotFoundException;
+import com.flab.tableorder.mapper.CallMapper;
 import com.flab.tableorder.mapper.CategoryMapper;
 import com.flab.tableorder.mapper.MenuMapper;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import com.flab.tableorder.mapper.OptionMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.bson.types.ObjectId;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,17 +39,29 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 public class MenuService {
+    private final CallRepository callRepository;
     private final CategoryRepository categoryRepository;
     private final MenuRepository menuRepository;
+    private final OptionRepository optionRepository;
+    private final RedisTemplate<String, MenuCategoryDTO> redisTemplate;
+
+    private static final String CACHE_PREFIX = "store:";
 
     @Transactional(readOnly = true)
     public List<MenuCategoryDTO> getAllMenu(String storeId) {
-        List<Category> categoryList = categoryRepository.findAllByStoreId(new ObjectId(storeId));
-        if (categoryList.isEmpty()) return new ArrayList<>();
+        String key = RedisConfig.getRedisKey("store", storeId);
+
+        List<MenuCategoryDTO> cached = redisTemplate.opsForList().range(key, 0, -1);
+        if (!cached.isEmpty()) return cached;
+
+        log.debug("캐시에 데이터 없음... DB 조회");
+
+        List<Category> categoryList = categoryRepository.findAllByStoreIdAndOptionFalse(new ObjectId(storeId));
+        if (categoryList.isEmpty()) return List.of();
 
         List<ObjectId> categoryIds = categoryList.stream()
             .map(category -> category.getCategoryId())
-            .collect(Collectors.toList());
+            .toList();
 
         List<Menu> menuList = menuRepository.findAllByCategoryIdIn(categoryIds);
         Map<String, List<Menu>> menuListMap = menuList.isEmpty()
@@ -47,16 +69,21 @@ public class MenuService {
             : menuList.stream()
                 .collect(Collectors.groupingBy(menu -> menu.getCategoryId().toString()));
 
-        return CategoryMapper.INSTANCE.toDTO(categoryList).stream()
+        List<MenuCategoryDTO> result = CategoryMapper.INSTANCE.toDTO(categoryList).stream()
             .map(menuCategoryDTO -> {
                 List<MenuDTO> menus = Optional.ofNullable(menuListMap.get(menuCategoryDTO.getCategoryId()))
                     .map(menu -> MenuMapper.INSTANCE.toDTO(menu))
-                    .orElseGet(() -> new ArrayList());
+                    .orElseGet(() -> List.of());
 
                 menuCategoryDTO.setMenu(menus);
                 return menuCategoryDTO;
             })
-            .collect(Collectors.toList());
+            .toList();
+
+        redisTemplate.opsForList().rightPushAll(key, result);
+        redisTemplate.expire(key, 6, TimeUnit.HOURS);
+
+        return result;
     }
 
     @Transactional(readOnly = true)
@@ -73,6 +100,33 @@ public class MenuService {
 
         if (!findStoreId.equals(storeId)) throw new StoreNotFoundException("Store mismatch: expected " + findStoreId + ", but got " + storeId);
 
-        return MenuMapper.INSTANCE.toDTO(menu);
+        MenuDTO returnMenu = MenuMapper.INSTANCE.toDTO(menu);
+        if (menu.isOptionEnabled()) {
+            List<ObjectId> categoryIds = Optional.ofNullable(menu.getOptionCategoryIds())
+                .filter(optionCategoryIds -> !optionCategoryIds.isEmpty())
+                .orElse(List.of());
+
+            Map<String, List<Option>> optionListMap = optionRepository.findAllByCategoryIdIn(categoryIds)
+                .stream().collect(Collectors.groupingBy(option -> option.getCategoryId().toString()));
+
+            returnMenu.setOptions(CategoryMapper.INSTANCE.toOptionDTO(categoryRepository.findAllByCategoryIdInAndOptionTrue(categoryIds))
+                .stream()
+                .map(categoryDTO -> {
+                    List<OptionDTO> options = Optional.ofNullable(optionListMap.get(categoryDTO.getCategoryId()))
+                        .map(option -> OptionMapper.INSTANCE.toDTO(option))
+                        .orElseGet(() -> List.of());
+
+                    categoryDTO.setOptions(options);
+                    return categoryDTO;
+                })
+                .toList());
+        }
+
+        return returnMenu;
+    }
+
+    @Transactional(readOnly = true)
+    public List<CallDTO> getAllCall(String storeId) {
+        return CallMapper.INSTANCE.toDTO(callRepository.findAllByStoreId(new ObjectId(storeId)));
     }
 }

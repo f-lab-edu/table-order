@@ -1,70 +1,76 @@
 package com.flab.tableorder.controller;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import com.flab.tableorder.DataLoader;
+import com.flab.tableorder.domain.Menu;
+import com.flab.tableorder.dto.OrderDTO;
 
 import java.util.*;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.flab.tableorder.dto.OrderOptionDTO;
+import lombok.extern.slf4j.Slf4j;
 
-@SpringBootTest
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Slf4j
 @AutoConfigureMockMvc
-class OrderControllerTests {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class OrderControllerTests extends AbstractControllerTest {
     @Autowired
-    private MockMvc mockMvc;
+    private TestRestTemplate restTemplate;
 
-    // @Test
-    // void postOrderSuccess() throws Exception {
-    // Map<String, Object> option1 = new HashMap<>();
-    // option1.put("optionId", 1);
-    // option1.put("quantity", 1);
-    // option1.put("price", 1000);
-    //
-    // Map<String, Object> option2 = new HashMap<>();
-    // option2.put("optionId", 2);
-    // option2.put("quantity", 2);
-    // option2.put("price", 1000);
-    //
-    // Map<String, Object> option3 = new HashMap<>();
-    // option3.put("optionId", 4);
-    // option3.put("quantity", 1);
-    // option3.put("price", 4000);
-    //
-    //
-    // Map<String, Object> menu = new HashMap<>();
-    // menu.put("menuId", 2);
-    // menu.put("quantity", 1);
-    // menu.put("price", 8500);
-    // menu.put("options", List.of(option1, option2, option3));
-    //
-    // Map<String, Object> requestData = new HashMap<>();
-    //
-    //
-    // mockMvc.perform(post("/order/table/1")
-    // .contentType(MediaType.APPLICATION_JSON)
-    // .content(requestData.toString())
-    // )
-    // .andExpect(status().isOk())
-    // .andExpect(jsonPath("$.code").value(200))
-    // ;
-    // }
-    //
-    // @Test
-    // void postCallSuccess() throws Exception {
-    // String jsonRequest = "{\"call\": [1, 3]}";
-    //
-    // mockMvc.perform(post("/order/table/1/call")
-    // .contentType(MediaType.APPLICATION_JSON)
-    // .content(jsonRequest)
-    // )
-    // .andExpect(status().isOk())
-    // .andExpect(jsonPath("$.code").value(200))
-    // ;
-    // }
+    @BeforeAll
+    @Override
+    void init() {
+        super.init();
+    }
+
+    @Test
+    void postOrderSuccess() {
+        Menu menu = this.menuList.get(0);
+
+        OrderDTO orderDTO = new OrderDTO();
+        orderDTO.setMenuId(menu.getMenuId().toString());
+        orderDTO.setQuantity(1);
+        orderDTO.setPrice(menu.getPrice());
+        orderDTO.setOptions(this.optionList.stream()
+            .filter(opt -> menu.getOptionCategoryIds().contains(opt.getCategoryId()))
+            .map(opt -> {
+                OrderOptionDTO optionDTO = new OrderOptionDTO();
+                optionDTO.setOptionId(opt.getOptionId().toString());
+                optionDTO.setPrice(opt.getPrice());
+                optionDTO.setQuantity(1);
+
+                return optionDTO;
+            })
+            .toList()
+        );
+        HttpEntity httpEntity = new HttpEntity(List.of(orderDTO), headers);
+
+        Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url + "/order/table/1", HttpMethod.POST, httpEntity);
+        assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
+    }
+
+    @Test
+    void postCallSuccess() {
+        HttpEntity httpEntity = new HttpEntity(
+            this.callList.stream()
+                .map(call -> call.getCallId().toString()),
+            headers);
+
+        Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url + "/order/table/1/call", HttpMethod.POST, httpEntity);
+        assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
+    }
 }

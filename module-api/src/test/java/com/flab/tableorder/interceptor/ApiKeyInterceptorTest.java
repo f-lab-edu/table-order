@@ -46,17 +46,16 @@ public class ApiKeyInterceptorTest {
     void init() {
         this.url = "http://localhost:" + port + "/menu";
 
-        Store store = new Store();
-        store.setStoreId(new ObjectId(this.storeId));
-        store.setApiKey(this.apiKey);
-
-        storeRepository.save(store);
+        Store store = DataLoader.getDataInfo("store", "pizza.json", Store.class);
+        this.storeId = store.getStoreId().toString();
+        this.apiKey = store.getApiKey();
     }
 
     @Test
     void APIKey_NoAuthorization() {
         Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, null);
         assertThat(responseData.get("code")).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+        assertThat(responseData.get("message")).isEqualTo("Invalid API Key");
     }
 
     @Test
@@ -68,7 +67,7 @@ public class ApiKeyInterceptorTest {
 
         Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, httpEntity);
         assertThat(responseData.get("code")).isEqualTo(HttpStatus.NOT_FOUND.value());
-        assertThat(responseData.get("message")).isEqualTo("Api Key not found");
+        assertThat(responseData.get("message").toString().startsWith("Store not found for API key:")).isTrue();
     }
 
     @Test
