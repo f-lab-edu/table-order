@@ -8,13 +8,13 @@
 
 # version
 - 2025.04.16 :
-	- API 추가
-		- PATCH /menu/table/{tableNum}/language
-		- GET /menu
-		- GET /menu/{menuId}
-		- GET /menu/call
-		- POST /order/table/{tableNum}
-		- POST /order/table/{tableNum}/call
+    - API 추가
+        - PATCH /menu/table/{tableNum}/language
+        - GET /menu
+        - GET /menu/{menuId}
+        - GET /menu/call
+        - POST /order/table/{tableNum}
+        - POST /order/table/{tableNum}/call
 - 2025.04.27 : isRequired 필드 추가
 - 2025.05.25 : GET /order/table/{tableNum} API 추가
 
