@@ -96,7 +96,7 @@ public class MenuServiceTest {
     }
 
     @Test
-    void getAllMenu_NotEmpty() {
+    void getAllMenu_Success() {
         String fileName = "pizza.json";
 
         Store mockStore = DataLoader.getDataInfo("store", fileName, Store.class);
@@ -151,8 +151,7 @@ public class MenuServiceTest {
 
         assertThatThrownBy(() -> menuService.getMenu("invalidStoreId", menuId.toString()))
             .isInstanceOf(StoreNotFoundException.class)
-            .hasMessageStartingWith("Store not found for categoryId:")
-        ;
+            .hasMessageStartingWith("Store not found for categoryId:");
     }
 
     @Test
@@ -169,8 +168,7 @@ public class MenuServiceTest {
 
         assertThatThrownBy(() -> menuService.getMenu("222222222222222222222222", menuId.toString()))
             .isInstanceOf(StoreNotFoundException.class)
-            .hasMessageStartingWith("Store mismatch:")
-        ;
+            .hasMessageStartingWith("Store mismatch:");
     }
 
     @Test
@@ -195,7 +193,7 @@ public class MenuServiceTest {
 
         List<Category> categoryList = DataLoader.getDataList("category", fileName, Category.class)
             .stream()
-            .filter(category ->  category.isOption())
+            .filter(category -> category.isOption())
             .toList();
         List<Option> optionList = DataLoader.getDataList("option", fileName, Option.class);
 

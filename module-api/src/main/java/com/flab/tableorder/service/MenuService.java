@@ -17,21 +17,18 @@ import com.flab.tableorder.mapper.CallMapper;
 import com.flab.tableorder.mapper.CategoryMapper;
 import com.flab.tableorder.mapper.MenuMapper;
 import com.flab.tableorder.mapper.OptionMapper;
-import com.flab.tableorder.util.RedisUtil;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import com.flab.tableorder.mapper.OptionMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.bson.types.ObjectId;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,17 +40,10 @@ public class MenuService {
     private final CategoryRepository categoryRepository;
     private final MenuRepository menuRepository;
     private final OptionRepository optionRepository;
-    private final RedisTemplate<String, MenuCategoryDTO> redisTemplate;
-
-    private static final String CACHE_PREFIX = "store:";
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "store", key = "#storeId")
     public List<MenuCategoryDTO> getAllMenu(String storeId) {
-        String key = RedisUtil.getRedisKey("store", storeId);
-
-        List<MenuCategoryDTO> cached = redisTemplate.opsForList().range(key, 0, -1);
-        if (!cached.isEmpty()) return cached;
-
         log.debug("캐시에 데이터 없음... DB 조회");
 
         List<Category> categoryList = categoryRepository.findAllByStoreIdAndOptionFalse(new ObjectId(storeId));
@@ -79,9 +69,6 @@ public class MenuService {
                 return menuCategoryDTO;
             })
             .toList();
-
-        redisTemplate.opsForList().rightPushAll(key, result);
-        redisTemplate.expire(key, 6, TimeUnit.HOURS);
 
         return result;
     }

@@ -44,7 +44,7 @@ class MenuControllerTests extends AbstractControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private RedisTemplate<String, List<Map<String, Object>>> redisTemplate;
 
     @Value("${db.data.init}")
     private String isInit;
@@ -121,12 +121,16 @@ class MenuControllerTests extends AbstractControllerTest {
         }
     }
     @Test
-    void getAllMenu_Success() {
+    void getAllMenuAndRedis_Success() {
+        String key = "store::" + this.store.getStoreId().toString();
+        redisTemplate.delete(key);
+
         Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url + "/menu", HttpMethod.GET, this.httpEntity);
 
         assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
 
         diffAllMenu((List<Map<String, Object>>) responseData.get("data"));
+        diffAllMenu(redisTemplate.opsForValue().get(key));
     }
 
      @Test
@@ -157,17 +161,5 @@ class MenuControllerTests extends AbstractControllerTest {
              assertThat(resCallList.get(i).get("callName")).isEqualTo(this.callList.get(i).getCallName());
          }
      }
-
-    @Test
-    void getAllMenu_Redis() {
-        Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
-        String storeId = mockStore.getStoreId().toString();
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        diffAllMenu(((StoreDTO) redisTemplate.opsForValue().get("store:" + storeId)).getCategories()
-            .stream()
-            .map(category -> (Map<String, Object>) objectMapper.convertValue(category, Map.class))
-            .toList());
-    }
 
 }
