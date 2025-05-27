@@ -31,7 +31,7 @@ public class StoreService {
     private final CallRepository callRepository;
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "storeCache", key = "#apiKey")
+    @Cacheable(value = "apiKey", key = "#apiKey")
     public String getStoreIdByApiKey(String apiKey) {
         log.debug("캐시에 API Key가 존재하지 않음... DB Select");
 

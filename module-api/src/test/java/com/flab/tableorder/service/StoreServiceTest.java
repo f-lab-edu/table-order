@@ -1,18 +1,21 @@
 package com.flab.tableorder.service;
 
-import com.flab.tableorder.domain.*;
-import com.flab.tableorder.exception.*;
+import com.flab.tableorder.domain.Store;
+import com.flab.tableorder.domain.StoreRepository;
+import com.flab.tableorder.exception.StoreNotFoundException;
 
 import java.util.Optional;
 
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.Mockito.*;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class StoreServiceTest {

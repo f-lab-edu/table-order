@@ -1,6 +1,6 @@
 package com.flab.tableorder.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
