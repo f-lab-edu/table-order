@@ -2,9 +2,6 @@ package com.flab.tableorder.config;
 
 import com.flab.tableorder.dto.MenuCategoryDTO;
 import com.flab.tableorder.dto.OrderDTO;
-import com.flab.tableorder.dto.StoreDTO;
-
-import java.util.List;
 
 import lombok.Setter;
 
@@ -27,10 +24,6 @@ public class RedisConfig {
     private int port;
     private String username;
     private String password;
-
-    public static String getRedisKey(String... keys) {
-        return String.join(":", keys);
-    }
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {

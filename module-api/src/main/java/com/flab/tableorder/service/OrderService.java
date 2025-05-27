@@ -1,6 +1,5 @@
 package com.flab.tableorder.service;
 
-import com.flab.tableorder.config.RedisConfig;
 import com.flab.tableorder.domain.Call;
 import com.flab.tableorder.domain.CallRepository;
 import com.flab.tableorder.domain.Menu;
@@ -99,11 +98,11 @@ public class OrderService {
     @Transactional
     public void updateOrderList(List<OrderDTO> orderList, String storeId, int tableNum) {
         redisTemplate.opsForList().rightPushAll(
-            RedisConfig.getRedisKey("order", storeId, String.valueOf(tableNum)),
+            RedisUtil.getRedisKey("order", storeId, String.valueOf(tableNum)),
             orderList);
 
         stringRedisTemplate.opsForValue().increment(
-            RedisConfig.getRedisKey(
+            RedisUtil.getRedisKey(
                 "totalPrice",
                 LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE),
                 storeId
@@ -122,7 +121,7 @@ public class OrderService {
     @Transactional
     public List<OrderDTO> getOrderList(String storeId, int tableNum) {
         return redisTemplate.opsForList().range(
-            RedisConfig.getRedisKey("order", storeId, String.valueOf(tableNum)),
+            RedisUtil.getRedisKey("order", storeId, String.valueOf(tableNum)),
             0,
             -1);
     }

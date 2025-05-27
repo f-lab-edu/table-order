@@ -1,6 +1,5 @@
 package com.flab.tableorder.service;
 
-import com.flab.tableorder.config.RedisConfig;
 import com.flab.tableorder.domain.CallRepository;
 import com.flab.tableorder.domain.Category;
 import com.flab.tableorder.domain.CategoryRepository;
@@ -12,12 +11,13 @@ import com.flab.tableorder.dto.CallDTO;
 import com.flab.tableorder.dto.MenuCategoryDTO;
 import com.flab.tableorder.dto.MenuDTO;
 import com.flab.tableorder.dto.OptionDTO;
-import com.flab.tableorder.dto.StoreDTO;
 import com.flab.tableorder.exception.MenuNotFoundException;
 import com.flab.tableorder.exception.StoreNotFoundException;
 import com.flab.tableorder.mapper.CallMapper;
 import com.flab.tableorder.mapper.CategoryMapper;
 import com.flab.tableorder.mapper.MenuMapper;
+import com.flab.tableorder.mapper.OptionMapper;
+import com.flab.tableorder.util.RedisUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +49,7 @@ public class MenuService {
 
     @Transactional(readOnly = true)
     public List<MenuCategoryDTO> getAllMenu(String storeId) {
-        String key = RedisConfig.getRedisKey("store", storeId);
+        String key = RedisUtil.getRedisKey("store", storeId);
 
         List<MenuCategoryDTO> cached = redisTemplate.opsForList().range(key, 0, -1);
         if (!cached.isEmpty()) return cached;
