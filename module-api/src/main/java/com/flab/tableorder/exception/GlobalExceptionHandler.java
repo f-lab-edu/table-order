@@ -4,6 +4,7 @@ import com.flab.tableorder.dto.ResponseDTO;
 
 import jakarta.persistence.EntityNotFoundException;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<ResponseDTO> handleNotFound(NoHandlerFoundException ex) {
@@ -33,7 +35,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({RuntimeException.class})
     public ResponseEntity<ResponseDTO> handleRuntimeException(RuntimeException ex) {
-        ResponseDTO responseData = new ResponseDTO(500, ex.getMessage());
+        String errorMessage = ex.getMessage();
+
+        log.error(errorMessage);
+        ResponseDTO responseData = new ResponseDTO(500, errorMessage);
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
     }
