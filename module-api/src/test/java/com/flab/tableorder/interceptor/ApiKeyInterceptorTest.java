@@ -4,6 +4,7 @@ import com.flab.tableorder.DataLoader;
 import com.flab.tableorder.domain.Store;
 import com.flab.tableorder.domain.StoreRepository;
 
+import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -36,7 +38,7 @@ public class ApiKeyInterceptorTest {
     @Autowired
     private TestRestTemplate restTemplate;
     @Autowired
-    private StoreRepository storeRepository;
+    private RedisTemplate<String, Object> redisTemplate;
 
     private String url;
     private String storeId = "";
@@ -72,6 +74,9 @@ public class ApiKeyInterceptorTest {
 
     @Test
     void APIKeyCache_Success() {
+        String key = "apiKey::" + this.apiKey;
+        redisTemplate.delete(key);
+
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + this.apiKey);
 
@@ -80,7 +85,6 @@ public class ApiKeyInterceptorTest {
         Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, httpEntity);
         assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
 
-        responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, httpEntity);
-        assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
+        assertThat(redisTemplate.opsForValue().get(key)).isEqualTo(this.storeId);
     }
 }
