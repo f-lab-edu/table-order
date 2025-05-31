@@ -251,6 +251,12 @@
         "message" : ""
     }
     ```
+- Flow
+    1. validation
+    2. 테이블의 주문 내역 업데이트 (Redis, 테이블 초기화 시 삭제)
+    3. 당일 기준 메뉴 및 옵션 판매 수량 업데이트 (Mongo) 
+    4. 당일 매출 업데이트 (Redis, 24h)
+
 ## 주문 내역 조회
 - API : GET /order/table/{tableNum}
 - Request
