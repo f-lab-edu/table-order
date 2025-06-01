@@ -15,5 +15,5 @@ public class Stat {
 
     private String date;
     private int quantity;
-    private int price = 0;
+    private int price;
 }
