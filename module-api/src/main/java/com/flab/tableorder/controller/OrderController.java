@@ -24,11 +24,11 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/table/{tableNum}")
-    public ResponseEntity<ResponseDTO> postOrder(@RequestBody List<OrderDTO> requestData, @PathVariable int tableNum) {
-        orderService.orderMenu(requestData, StoreContext.getStoreId());
-        orderService.updateOrderList(requestData, StoreContext.getStoreId(), tableNum);
+    public ResponseEntity<ResponseDTO<List<OrderDTO>>> postOrder(@RequestBody List<OrderDTO> requestData, @PathVariable int tableNum) {
+        List<OrderDTO> orderListAll = orderService.orderMenu(requestData, StoreContext.getStoreId(), tableNum);
 
-        ResponseDTO responseData = new ResponseDTO<>(200, "");
+        //        TODO: POS기로 주문 정보 전송
+        ResponseDTO<List<OrderDTO>> responseData = new ResponseDTO<>(200, "", orderListAll);
 
         return ResponseEntity.ok(responseData);
     }

@@ -7,76 +7,109 @@ import com.flab.tableorder.domain.Menu;
 import com.flab.tableorder.domain.MenuRepository;
 import com.flab.tableorder.domain.Option;
 import com.flab.tableorder.domain.OptionRepository;
+import com.flab.tableorder.domain.Stat;
+import com.flab.tableorder.domain.StatRepository;
 import com.flab.tableorder.domain.Store;
-
-import java.util.List;
-
 import com.flab.tableorder.dto.OrderDTO;
 import com.flab.tableorder.dto.OrderOptionDTO;
 import com.flab.tableorder.exception.MenuNotFoundException;
 import com.flab.tableorder.exception.PriceNotMatchedException;
+import com.flab.tableorder.util.RedisUtil;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceTest {
     @Mock
-    private RedisTemplate<String, Object> redisTemplate;
+    private RedisTemplate<String, List<OrderDTO>> redisTemplate;
+    @Mock
+    private ValueOperations<String, List<OrderDTO>> valueOperations;
     @Mock
     private StringRedisTemplate stringRedisTemplate;
     @Mock
-    private ValueOperations valueOperations;
-    @Mock
-    private ListOperations<String, Object> listOperations;
+    private ValueOperations stringValueOperations;
+
     @Mock
     private CallRepository callRepository;
     @Mock
     private MenuRepository menuRepository;
     @Mock
     private OptionRepository optionRepository;
+    @Mock
+    private StatRepository statRepository;
+
     @InjectMocks
     private OrderService orderService;
 
     @Test
-    void order_NotFound_Menu() {
+    void validationPrice_empty() {
         Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
         String storeId = mockStore.getStoreId().toString();
 
-        OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setMenuId("681edb5be8f2f34d23ecf6b0");
-        orderDTO.setPrice(1000);
-        orderDTO.setQuantity(1);
-
-        when(menuRepository.findAllByMenuIdIn(List.of(new ObjectId(orderDTO.getMenuId())))).thenReturn(List.of());
-
-        assertThatThrownBy(() -> orderService.orderMenu(List.of(orderDTO), storeId))
+        assertThatThrownBy(() -> orderService.validationPrice(List.of(), storeId))
             .isInstanceOf(MenuNotFoundException.class)
-            .hasMessage("Not found order a menu");
+            .hasMessage("주문하신 메뉴가 없습니다.");
     }
 
     @Test
-    void order_NotMatch_Menu_price() {
+    void validationPrice_NotFound_Menu() {
+        Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
+        String storeId = mockStore.getStoreId().toString();
+
+        OrderDTO orderDTO = OrderDTO.builder()
+            .menuId("681edb5be8f2f34d23ecf6b0")
+            .price(1000)
+            .quantity(1)
+            .build();
+
+        when(menuRepository.findAllByMenuIdIn(List.of(new ObjectId(orderDTO.getMenuId())))).thenReturn(List.of());
+
+        assertThatThrownBy(() -> orderService.validationPrice(List.of(orderDTO), storeId))
+            .isInstanceOf(MenuNotFoundException.class)
+            .hasMessage("주문한 메뉴를 찾을 수 없습니다.");
+    }
+
+    @Test
+    void validationPrice_NotMatch_Menu_price() {
         Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
         String storeId = mockStore.getStoreId().toString();
 
         String menuId = "681edb5be8f2f34d23ecf6b0";
 
-        OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setMenuId(menuId);
-        orderDTO.setPrice(1000);
-        orderDTO.setQuantity(1);
+        OrderDTO orderDTO = OrderDTO.builder()
+            .menuId(menuId)
+            .price(1000)
+            .quantity(1)
+            .build();
 
         Menu menu = new Menu();
         menu.setMenuId(new ObjectId(menuId));
@@ -84,22 +117,23 @@ public class OrderServiceTest {
         when(menuRepository.findAllByMenuIdIn(List.of(new ObjectId(orderDTO.getMenuId()))))
             .thenReturn(List.of(menu));
 
-        assertThatThrownBy(() -> orderService.orderMenu(List.of(orderDTO), storeId))
+        assertThatThrownBy(() -> orderService.validationPrice(List.of(orderDTO), storeId))
             .isInstanceOf(PriceNotMatchedException.class)
-            .hasMessageStartingWith("Menu price does not match.");
+            .hasMessageStartingWith("주문한 메뉴의 가격이 변동되었습니다.");
     }
 
     @Test
-    void order_NotMatch_Option_size() {
+    void validationPrice_NotMatch_Option_size() {
         Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
         String storeId = mockStore.getStoreId().toString();
 
         String menuId = "681edb5be8f2f34d23ecf6b0";
 
-        OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setMenuId(menuId);
-        orderDTO.setPrice(1000);
-        orderDTO.setQuantity(1);
+        OrderDTO orderDTO = OrderDTO.builder()
+            .menuId(menuId)
+            .price(1000)
+            .quantity(1)
+            .build();
 
         OrderOptionDTO optionDTO = new OrderOptionDTO();
         optionDTO.setOptionId("681edb5be8f2f34d23ecf6b1");
@@ -122,23 +156,25 @@ public class OrderServiceTest {
             .map(option -> new ObjectId(option.getOptionId()))
             .toList())).thenReturn(List.of());
 
-        assertThatThrownBy(() -> orderService.orderMenu(orderList, storeId))
+        assertThatThrownBy(() -> orderService.validationPrice(orderList, storeId))
             .isInstanceOf(MenuNotFoundException.class)
-            .hasMessage("Attempted to order a option item that does not exist.");
+            .hasMessage("주문한 옵션을 찾을 수 없습니다.");
     }
 
     @Test
-    void order_NotMatch_Option_price() {
+    void validationPrice_NotMatch_Option_price() {
         Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
         String storeId = mockStore.getStoreId().toString();
 
         String menuId = "681edb5be8f2f34d23ecf6b0";
         String optionId = "681edb5be8f2f34d23ecf6b1";
 
-        OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setMenuId(menuId);
-        orderDTO.setPrice(1000);
-        orderDTO.setQuantity(1);
+        OrderDTO orderDTO = OrderDTO.builder()
+            .menuId(menuId)
+            .price(1000)
+            .quantity(1)
+            .build();
+
         List<OrderDTO> orderList = List.of(orderDTO);
 
         OrderOptionDTO optionDTO = new OrderOptionDTO();
@@ -166,71 +202,223 @@ public class OrderServiceTest {
             .toList();
         when(optionRepository.findAllByOptionIdIn(optionIds)).thenReturn(List.of(option));
 
-        assertThatThrownBy(() -> orderService.orderMenu(orderList, storeId))
+        assertThatThrownBy(() -> orderService.validationPrice(orderList, storeId))
             .isInstanceOf(PriceNotMatchedException.class)
-            .hasMessageStartingWith("Option price does not match.");
+            .hasMessageStartingWith("주문한 옵션의 가격이 변동되었습니다.");
+    }
+
+    @Test
+    void validationPrice_Success() {
+        List<OrderDTO> mockOrderList = getOrderList();
+
+        Set<ObjectId> menuIds = mockOrderList.stream()
+            .map(order -> new ObjectId(order.getMenuId()))
+            .collect(Collectors.toSet());
+
+        when(menuRepository.findAllByMenuIdIn(argThat(actualIds ->
+            new HashSet<>(actualIds).equals(menuIds))))
+                .thenReturn(mockOrderList.stream()
+                    .map(order -> {
+                        Menu menu = new Menu();
+                        menu.setMenuId(new ObjectId(order.getMenuId()));
+                        menu.setPrice(order.getPrice());
+
+                        return menu;
+                    })
+                    .toList());
+
+        List<OrderOptionDTO> optionList = mockOrderList.stream()
+            .flatMap(orderDTO -> Optional.ofNullable(orderDTO.getOptions())
+                .orElse(List.of())
+                .stream())
+            .toList();
+
+        Set<ObjectId> optionIds = optionList.stream()
+            .map(opt -> new ObjectId(opt.getOptionId()))
+            .collect(Collectors.toSet());
+
+        when(optionRepository.findAllByOptionIdIn(argThat(actualIds ->
+            new HashSet<>(actualIds).equals(optionIds))))
+                .thenReturn(optionList.stream()
+                    .map(orderOption -> {
+                        Option option = new Option();
+                        option.setOptionId(new ObjectId(orderOption.getOptionId()));
+                        option.setPrice(orderOption.getPrice());
+
+                        return option;
+                    })
+                    .toList());
+
+        Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
+        assertThat(orderService.validationPrice(mockOrderList, mockStore.getStoreId().toString())).isTrue();
+    }
+
+    @Test
+    void updateAndGetOrderCache_Success() {
+        Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
+        int tableNum = 1;
+        List<OrderDTO> mockOrderList = getOrderList();
+
+        doReturn(valueOperations).when(redisTemplate).opsForValue();
+        doReturn(new ArrayList()).when(valueOperations).get(anyString());
+        doNothing().when(valueOperations).set(anyString(), anyList());
+
+        List<OrderDTO> orderList = orderService.updateAndGetOrderCache(mockOrderList, mockStore.getStoreId().toString(), tableNum);
+
+        diffOrderList(mockOrderList, orderList);
+    }
+
+    @Test
+    void updateAndGetTotalPriceCache_Success() {
+        Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
+        List<OrderDTO> mockOrderList = getOrderList();
+        int totalPrice = mockOrderList.stream()
+            .mapToInt(orderDTO -> orderDTO.getPrice() * orderDTO.getQuantity() +
+                Optional.ofNullable(orderDTO.getOptions())
+                    .orElse(Collections.emptyList())
+                    .stream()
+                    .mapToInt(optionDTO -> optionDTO.getPrice() * optionDTO.getQuantity())
+                    .sum()
+            )
+            .sum();
+
+        String key = RedisUtil.getRedisKey(
+            "totalPrice",
+            LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE),
+            mockStore.getStoreId().toString());
+        when(stringRedisTemplate.opsForValue()).thenReturn(stringValueOperations);
+        when(stringValueOperations.get(key)).thenReturn(Integer.toString(totalPrice));
+
+        assertThat(orderService.updateAndGetTotalPrice(mockOrderList, key)).isEqualTo(totalPrice);
+    }
+
+    @Test
+    void appendOrderAndGetStats() {
+        Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
+        ObjectId storeId = mockStore.getStoreId();
+        String date = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
+        int tableNum = 1;
+
+        List<OrderDTO> orderList = getOrderList();
+        List<Stat> mockStatList = orderList.stream()
+            .flatMap(order -> {
+                ObjectId menuId = new ObjectId(order.getMenuId());
+
+                Stat orderStat = Stat.builder()
+                    .storeId(storeId)
+                    .menuId(menuId)
+                    .date(date)
+                    .price(order.getPrice())
+                    .quantity(order.getQuantity())
+                    .build();
+
+                Stream<Stat> optionStats = order.getOptions() == null ? Stream.empty() :
+                    order.getOptions().stream()
+                        .map(orderOption -> Stat.builder()
+                            .storeId(storeId)
+                            .menuId(menuId)
+                            .optionId(new ObjectId(orderOption.getOptionId()))
+                            .date(date)
+                            .price(orderOption.getPrice())
+                            .quantity(orderOption.getQuantity())
+                            .build());
+
+                return Stream.concat(Stream.of(orderStat), optionStats);
+            })
+            .toList();
+
+        when(statRepository.findAllOrderStats(storeId, date)).thenReturn(mockStatList);
+
+        List<Stat> statList = orderService.appendOrderAndGetStats(orderList, storeId, date);
+        for (int i = 0; i < statList.size(); i++) {
+            Stat stat = statList.get(i);
+            Stat mockStat = mockStatList.get(i);
+
+            assertThat(stat.getStoreId()).isEqualTo(mockStat.getStoreId());
+            assertThat(stat.getMenuId()).isEqualTo(mockStat.getMenuId());
+            assertThat(stat.getOptionId()).isEqualTo(mockStat.getOptionId());
+            assertThat(stat.getQuantity()).isEqualTo(mockStat.getQuantity());
+            assertThat(stat.getPrice()).isEqualTo(mockStat.getPrice());
+            assertThat(stat.getDate()).isEqualTo(mockStat.getDate());
+        }
     }
 
     private List<OrderDTO> getOrderList() {
-        String menuId = "681edb5be8f2f34d23ecf6b0";
-        String optionId = "681edb5be8f2f34d23ecf6b1";
 
-        OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setMenuId(menuId);
-        orderDTO.setPrice(1000);
-        orderDTO.setQuantity(1);
+        OrderDTO orderDTO1 = OrderDTO.builder()
+            .menuId("681edb5be8f2f34d23ecf6b0")
+            .price(1000)
+            .quantity(1)
+            .build();
 
         OrderOptionDTO optionDTO = new OrderOptionDTO();
-        optionDTO.setOptionId(optionId);
+        optionDTO.setOptionId("681edb5be8f2f34d23ecf6b1");
         optionDTO.setPrice(500);
         List<OrderOptionDTO> optionList = List.of(optionDTO);
 
-        orderDTO.setOptions(optionList);
-        return List.of(orderDTO);
+        orderDTO1.setOptions(optionList);
+
+        OrderDTO orderDTO2 = OrderDTO.builder()
+            .menuId("681edb5be8f2f34d23ecf6b6")
+            .price(4000)
+            .quantity(2)
+            .build();
+
+        return List.of(orderDTO1, orderDTO2);
+    }
+
+    public static void diffOrderList(List<OrderDTO> mockOrderList, List<OrderDTO> orderList) {
+        assertThat(orderList.size()).isEqualTo(mockOrderList.size());
+        for (int i = 0; orderList.size() > i; i++) {
+            OrderDTO order = orderList.get(i);
+            OrderDTO mockOrder = mockOrderList.get(i);
+
+            assertThat(order.getMenuId()).isEqualTo(mockOrder.getMenuId());
+            assertThat(order.getPrice()).isEqualTo(mockOrder.getPrice());
+            assertThat(order.getQuantity()).isEqualTo(mockOrder.getQuantity());
+
+            if (mockOrder.getOptions() != null) {
+                assertThat(order.getOptions().size()).isEqualTo(mockOrder.getOptions().size());
+                for (int j = 0; order.getOptions().size() > j; j++) {
+                    OrderOptionDTO option = order.getOptions().get(j);
+                    OrderOptionDTO mockOption = mockOrder.getOptions().get(j);
+
+                    assertThat(option.getOptionId()).isEqualTo(mockOption.getOptionId());
+                    assertThat(option.getPrice()).isEqualTo(mockOption.getPrice());
+                    assertThat(option.getQuantity()).isEqualTo(mockOption.getQuantity());
+                }
+            } else {
+                assertThat(order.getOptions()).isNull();
+            }
+        }
     }
 
     @Test
-    void order_Success() {
-        Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
-        String storeId = mockStore.getStoreId().toString();
-
-        List<OrderDTO> orderList = getOrderList();
-        String menuId = orderList.get(0).getMenuId();
-
-        List<OrderOptionDTO> optionList = orderList.get(0).getOptions();
-        String optionId = optionList.get(0).getOptionId();
-
-        Menu menu = new Menu();
-        menu.setMenuId(new ObjectId(menuId));
-        menu.setPrice(1000);
-
-        List<ObjectId> menuIds = orderList.stream()
-            .map(order -> new ObjectId(order.getMenuId()))
-            .toList();
-        when(menuRepository.findAllByMenuIdIn(menuIds)).thenReturn(List.of(menu));
-
-        Option option = new Option();
-        option.setOptionId(new ObjectId(optionId));
-        option.setPrice(500);
-
-        List<ObjectId> optionIds = optionList.stream()
-            .map(opt -> new ObjectId(opt.getOptionId()))
-            .toList();
-        when(optionRepository.findAllByOptionIdIn(optionIds)).thenReturn(List.of(option));
-
-        assertDoesNotThrow(() -> orderService.orderMenu(orderList, storeId));
-    }
-
-    @Test
-    void updateOrder_Success() {
+    void updateAndGetTotalPrice_Success() {
         Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
         String storeId = mockStore.getStoreId().toString();
         List<OrderDTO> orderList = getOrderList();
 
-        when(redisTemplate.opsForList()).thenReturn(listOperations);
-        when(stringRedisTemplate.opsForValue()).thenReturn(valueOperations);
+        String key = RedisUtil.getRedisKey(
+            "totalPrice",
+            LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE),
+            storeId
+        );
 
-        assertDoesNotThrow(() -> orderService.updateOrderList(orderList, storeId, 1));
+        int totalPrice = orderList.stream()
+            .mapToInt(orderDTO -> orderDTO.getPrice() * orderDTO.getQuantity() +
+                Optional.ofNullable(orderDTO.getOptions())
+                    .orElse(Collections.emptyList())
+                    .stream()
+                    .mapToInt(optionDTO -> optionDTO.getPrice() * optionDTO.getQuantity())
+                    .sum()
+            )
+            .sum();
+
+        when(stringRedisTemplate.opsForValue()).thenReturn(stringValueOperations);
+        when(stringValueOperations.get(key)).thenReturn(Integer.toString(totalPrice));
+
+        assertThat(orderService.updateAndGetTotalPrice(orderList, key)).isEqualTo(totalPrice);
     }
 
     @Test
