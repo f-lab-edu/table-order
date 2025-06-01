@@ -1,6 +1,7 @@
 package com.flab.tableorder.config;
 
 import com.flab.tableorder.dto.MenuCategoryDTO;
+import com.flab.tableorder.dto.OrderDTO;
 import com.flab.tableorder.serializer.DefaultRedisSerializer;
 import com.flab.tableorder.serializer.ListRedisSerializer;
 
@@ -56,10 +57,24 @@ public class RedisConfig {
         cacheConfigurations.put("store", defaultCacheConfig.entryTtl(Duration.ofHours(1))
             .serializeValuesWith(SerializationPair.fromSerializer(new ListRedisSerializer<MenuCategoryDTO>())));
 
+        cacheConfigurations.put("order", defaultCacheConfig.serializeValuesWith(
+            SerializationPair.fromSerializer(new ListRedisSerializer<>(OrderDTO.class))));
+
         return RedisCacheManager.builder(connectionFactory)
             .cacheDefaults(defaultCacheConfig)
             .withInitialCacheConfigurations(cacheConfigurations)
             .build();
+    }
+
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+
+        return template;
     }
 
     @Bean
@@ -69,17 +84,6 @@ public class RedisConfig {
 
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new ListRedisSerializer<T>());
-
-        return template;
-    }
-
-    @Bean
-    public <T> RedisTemplate<String, T> redisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, T> template = new RedisTemplate<>();
-        template.setConnectionFactory(connectionFactory);
-
-        template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new DefaultRedisSerializer<T>());
 
         return template;
     }
