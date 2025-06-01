@@ -20,7 +20,6 @@ public class Menu {
 
     private String menuName;
     private String description;
-    private int quantity;
     private int price = 0;
     private int salePrice = 0;
     private String image;
