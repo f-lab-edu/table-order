@@ -1,4 +1,4 @@
-package com.flab.tableorder.domain;
+package com.flab.tableorder.document;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;

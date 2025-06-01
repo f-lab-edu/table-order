@@ -1,4 +1,4 @@
-package com.flab.tableorder.domain;
+package com.flab.tableorder.document;
 
 import lombok.Getter;
 import lombok.Setter;

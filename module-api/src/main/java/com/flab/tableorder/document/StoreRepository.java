@@ -1,4 +1,4 @@
-package com.flab.tableorder.domain;
+package com.flab.tableorder.document;
 
 import java.util.Optional;
 

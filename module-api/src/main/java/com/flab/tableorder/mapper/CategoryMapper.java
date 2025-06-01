@@ -1,6 +1,6 @@
 package com.flab.tableorder.mapper;
 
-import com.flab.tableorder.domain.Category;
+import com.flab.tableorder.document.Category;
 import com.flab.tableorder.dto.MenuCategoryDTO;
 
 import java.util.List;

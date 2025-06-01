@@ -2,8 +2,8 @@ package com.flab.tableorder.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.tableorder.DataLoader;
-import com.flab.tableorder.domain.Menu;
-import com.flab.tableorder.domain.Stat;
+import com.flab.tableorder.document.Menu;
+import com.flab.tableorder.document.Stat;
 import com.flab.tableorder.dto.OrderDTO;
 import com.flab.tableorder.dto.OrderOptionDTO;
 import com.flab.tableorder.service.OrderService;
@@ -49,7 +49,7 @@ class OrderControllerTests extends AbstractControllerTest {
 
     @BeforeAll
     @Override
-    protected void init() {
+    void init() {
         super.init();
     }
 

@@ -1,15 +1,11 @@
 package com.flab.tableorder.interceptor;
 
 import com.flab.tableorder.DataLoader;
-import com.flab.tableorder.domain.Store;
-import com.flab.tableorder.domain.StoreRepository;
+import com.flab.tableorder.document.Store;
 
-import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
-
-import org.bson.types.ObjectId;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

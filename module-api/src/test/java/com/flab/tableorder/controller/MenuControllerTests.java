@@ -1,12 +1,12 @@
 package com.flab.tableorder.controller;
 
 import com.flab.tableorder.DataLoader;
-import com.flab.tableorder.domain.CallRepository;
-import com.flab.tableorder.domain.CategoryRepository;
-import com.flab.tableorder.domain.MenuRepository;
-import com.flab.tableorder.domain.Menu;
-import com.flab.tableorder.domain.OptionRepository;
-import com.flab.tableorder.domain.StoreRepository;
+import com.flab.tableorder.document.CallRepository;
+import com.flab.tableorder.document.CategoryRepository;
+import com.flab.tableorder.document.MenuRepository;
+import com.flab.tableorder.document.Menu;
+import com.flab.tableorder.document.OptionRepository;
+import com.flab.tableorder.document.StoreRepository;
 import com.flab.tableorder.dto.MenuCategoryDTO;
 import com.flab.tableorder.dto.MenuDTO;
 
