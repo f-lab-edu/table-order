@@ -422,6 +422,18 @@ public class OrderServiceTest {
     }
 
     @Test
+    void clearOrderCache_Success() {
+        Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
+        String storeId = mockStore.getStoreId().toString();
+        int tableNum = 1;
+
+        doReturn(valueOperations).when(redisTemplate).opsForValue();
+        doReturn(List.of()).when(valueOperations).get(anyString());
+
+        assertThat(orderService.clearOrderCache(storeId, tableNum)).isEmpty();
+    }
+
+    @Test
     void call_NotMatch_call_size() {
         Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
         ObjectId objectId = mockStore.getStoreId();

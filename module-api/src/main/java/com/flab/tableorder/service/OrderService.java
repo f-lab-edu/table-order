@@ -183,8 +183,13 @@ public class OrderService {
     @Transactional(readOnly = true)
     @Cacheable(value = "order", key = "#storeId + ':' + #tableNum")
     public List<OrderDTO> getOrderList(String storeId, int tableNum) {
-        log.debug("getOrderList 캐시에 데이터 없음... DB 조회");
         return List.of();
+    }
+
+    public List<OrderDTO> clearOrderCache(String storeId, int tableNum) {
+        String key = RedisUtil.getRedisKey("order:", storeId, Integer.toString(tableNum));
+        redisTemplate.delete(key);
+        return redisTemplate.opsForValue().get(key);
     }
 
     @Transactional(readOnly = true)

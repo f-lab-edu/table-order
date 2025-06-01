@@ -128,7 +128,6 @@ class OrderControllerTests extends AbstractControllerTest {
             })
             .toList());
 
-
         List<OrderDTO> beforeOrderList = orderService.getOrderList(storeId.toString(), tableNum);
         Map<String, Integer> beforeStatMap = makeStatMap(orderService.getTodayOrderStats(storeId, date));
 
@@ -158,6 +157,17 @@ class OrderControllerTests extends AbstractControllerTest {
         orderStatMap.forEach((key, value) -> {
             assertThat(afterStatMap.get(key) - value).isEqualTo(Optional.ofNullable(beforeStatMap.get(key)).orElse(0));
         });
+    }
+
+    @Test
+    void clearTableSuccess() {
+        int tableNum = 1;
+
+        HttpEntity httpEntity = new HttpEntity(headers);
+        Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url + "/order/table/" + tableNum, HttpMethod.DELETE, httpEntity);
+        assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
+        assertThat(responseData.get("data")).isEqualTo(List.of());
+
     }
 
     @Test

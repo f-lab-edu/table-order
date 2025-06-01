@@ -9,6 +9,7 @@ import java.util.List;
 import com.flab.tableorder.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +28,15 @@ public class OrderController {
     public ResponseEntity<ResponseDTO<List<OrderDTO>>> postOrder(@RequestBody List<OrderDTO> requestData, @PathVariable int tableNum) {
         List<OrderDTO> orderListAll = orderService.orderMenu(requestData, StoreContext.getStoreId(), tableNum);
 
-        //        TODO: POS기로 주문 정보 전송
+        ResponseDTO<List<OrderDTO>> responseData = new ResponseDTO<>(200, "", orderListAll);
+
+        return ResponseEntity.ok(responseData);
+    }
+
+    @DeleteMapping("/table/{tableNum}")
+    public ResponseEntity<ResponseDTO<List<OrderDTO>>> clearTable(@PathVariable int tableNum) {
+        List<OrderDTO> orderListAll = orderService.clearOrderCache(StoreContext.getStoreId(), tableNum);
+
         ResponseDTO<List<OrderDTO>> responseData = new ResponseDTO<>(200, "", orderListAll);
 
         return ResponseEntity.ok(responseData);
