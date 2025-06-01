@@ -31,7 +31,7 @@ public class StoreServiceTest {
 
         assertThatThrownBy(() -> storeService.getStoreIdByApiKey(apiKey))
             .isInstanceOf(StoreNotFoundException.class)
-            .hasMessageStartingWith("Store not found for API key:");
+            .hasMessage("요청하신 API 키로 등록된 매장을 찾을 수 없습니다.");
     }
 
     @Test

@@ -53,7 +53,7 @@ public class ApiKeyInterceptorTest {
     void APIKey_NoAuthorization() {
         Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, null);
         assertThat(responseData.get("code")).isEqualTo(HttpStatus.UNAUTHORIZED.value());
-        assertThat(responseData.get("message")).isEqualTo("Invalid API Key");
+        assertThat(responseData.get("message")).isEqualTo("요청에 사용된 API 키가 올바르지 않습니다. 관리자에게 문의해 주세요.");
     }
 
     @Test
@@ -65,7 +65,7 @@ public class ApiKeyInterceptorTest {
 
         Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, httpEntity);
         assertThat(responseData.get("code")).isEqualTo(HttpStatus.NOT_FOUND.value());
-        assertThat(responseData.get("message").toString().startsWith("Store not found for API key:")).isTrue();
+        assertThat(responseData.get("message").toString()).isEqualTo("요청하신 API 키로 등록된 매장을 찾을 수 없습니다.");
     }
 
     @Test

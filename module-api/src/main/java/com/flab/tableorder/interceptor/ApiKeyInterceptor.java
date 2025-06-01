@@ -30,10 +30,10 @@ public class ApiKeyInterceptor implements HandlerInterceptor {
         String apiKey = request.getHeader("Authorization");
         if (apiKey == null || !apiKey.startsWith(apiKeyHeader)) {
             httpStatus = HttpStatus.UNAUTHORIZED.value();
-            ResponseDTO responseData = new ResponseDTO<>(httpStatus, "Invalid API Key");
+            ResponseDTO responseData = new ResponseDTO<>(httpStatus, "요청에 사용된 API 키가 올바르지 않습니다. 관리자에게 문의해 주세요.");
 
             response.setStatus(httpStatus);
-            response.setContentType("application/json");
+            response.setContentType("application/json; charset=UTF-8");
             response.getWriter().write(objectMapper.writeValueAsString(responseData));
 
             return false;

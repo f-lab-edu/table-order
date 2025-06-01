@@ -77,15 +77,15 @@ public class MenuService {
     public MenuDTO getMenu(String storeId, String menuId) {
         ObjectId objMenuId = new ObjectId(menuId);
         Menu menu = menuRepository.findByMenuId(objMenuId)
-            .orElseThrow(() -> new MenuNotFoundException("Menu not found for menuId: " + menuId));
+            .orElseThrow(() -> new MenuNotFoundException("메뉴를 찾을 수 없습니다."));
 
         ObjectId findCategoryId = menu.getCategoryId();
         String findStoreId = categoryRepository.findByCategoryId(findCategoryId)
             .map(category -> category.getStoreId().toString())
-            .orElseThrow(() -> new StoreNotFoundException("Store not found for categoryId: " + findCategoryId))
+            .orElseThrow(() -> new StoreNotFoundException("해당 카테고리에 해당하는 매장을 찾을 수 없습니다."))
         ;
 
-        if (!findStoreId.equals(storeId)) throw new StoreNotFoundException("Store mismatch: expected " + findStoreId + ", but got " + storeId);
+        if (!findStoreId.equals(storeId)) throw new StoreNotFoundException("해당 매장을 찾을 수 없습니다.");
 
         MenuDTO returnMenu = MenuMapper.INSTANCE.toDTO(menu);
         if (menu.isOptionEnabled()) {

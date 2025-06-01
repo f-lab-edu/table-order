@@ -128,7 +128,7 @@ public class MenuServiceTest {
 
         assertThatThrownBy(() -> menuService.getMenu("invalidStoreId", menuId.toString()))
             .isInstanceOf(MenuNotFoundException.class)
-            .hasMessageStartingWith("Menu not found for menuId:");
+            .hasMessage("메뉴를 찾을 수 없습니다.");
     }
 
     @Test
@@ -142,7 +142,7 @@ public class MenuServiceTest {
 
         assertThatThrownBy(() -> menuService.getMenu("invalidStoreId", menuId.toString()))
             .isInstanceOf(StoreNotFoundException.class)
-            .hasMessageStartingWith("Store not found for categoryId:");
+            .hasMessage("해당 카테고리에 해당하는 매장을 찾을 수 없습니다.");
     }
 
     @Test
@@ -159,7 +159,7 @@ public class MenuServiceTest {
 
         assertThatThrownBy(() -> menuService.getMenu("222222222222222222222222", menuId.toString()))
             .isInstanceOf(StoreNotFoundException.class)
-            .hasMessageStartingWith("Store mismatch:");
+            .hasMessage("해당 매장을 찾을 수 없습니다.");
     }
 
     @Test

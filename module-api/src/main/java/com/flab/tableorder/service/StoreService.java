@@ -33,7 +33,7 @@ public class StoreService {
         log.debug("캐시에 API Key가 존재하지 않음... DB Select");
 
         Store store = storeRepository.findByApiKey(apiKey)
-            .orElseThrow(() -> new StoreNotFoundException("Store not found for API key: " + apiKey));
+            .orElseThrow(() -> new StoreNotFoundException("요청하신 API 키로 등록된 매장을 찾을 수 없습니다."));
 
         return store.getStoreId().toString();
     }
