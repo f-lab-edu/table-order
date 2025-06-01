@@ -55,7 +55,7 @@ public class RedisConfig {
             .serializeValuesWith(defaultSerializer));
 
         cacheConfigurations.put("store", defaultCacheConfig.entryTtl(Duration.ofHours(1))
-            .serializeValuesWith(SerializationPair.fromSerializer(new ListRedisSerializer<MenuCategoryDTO>())));
+            .serializeValuesWith(SerializationPair.fromSerializer(new ListRedisSerializer<>(MenuCategoryDTO.class))));
 
         cacheConfigurations.put("order", defaultCacheConfig.serializeValuesWith(
             SerializationPair.fromSerializer(new ListRedisSerializer<>(OrderDTO.class))));

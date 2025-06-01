@@ -2,6 +2,7 @@ package com.flab.tableorder.serializer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -17,9 +18,16 @@ public class ListRedisSerializer<T> implements RedisSerializer<List<T>> {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final TypeReference<List<T>> typeReference;
+    private final JavaType javaType;
 
     public ListRedisSerializer() {
         this.typeReference = new TypeReference<List<T>>() {};
+        this.javaType = null;
+    }
+
+    public ListRedisSerializer(Class<T> cls) {
+        this.typeReference = new TypeReference<List<T>>() {};
+        this.javaType = objectMapper.getTypeFactory().constructCollectionType(List.class, cls);
     }
 
     @Override
@@ -37,7 +45,7 @@ public class ListRedisSerializer<T> implements RedisSerializer<List<T>> {
         if (bytes == null || bytes.length == 0) return List.of();
 
         try {
-            return this.objectMapper.readValue(bytes, this.typeReference);
+            return javaType != null ? this.objectMapper.readValue(bytes, this.javaType) : this.objectMapper.readValue(bytes, this.typeReference);
         } catch (IOException e) {
             log.error(e.getMessage());
             throw new SerializationException("Could not deserialize list", e);
