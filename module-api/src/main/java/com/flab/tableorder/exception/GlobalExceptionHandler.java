@@ -16,18 +16,21 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 public class GlobalExceptionHandler {
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<ResponseDTO> handleNotFound(NoHandlerFoundException ex) {
+        log.error(ex.getMessage());
         ResponseDTO response = new ResponseDTO(404, "Requested resource not found.");
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler({EntityNotFoundException.class, StoreNotFoundException.class, MenuNotFoundException.class})
     public ResponseEntity<ResponseDTO> handleEntityNotFound(RuntimeException ex) {
+        log.error(ex.getMessage());
         ResponseDTO responseData = new ResponseDTO(404, ex.getMessage());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
     }
     @ExceptionHandler({PriceNotMatchedException.class})
     public ResponseEntity<ResponseDTO> handleEntityNotMatched(RuntimeException ex) {
+        log.error(ex.getMessage());
         ResponseDTO responseData = new ResponseDTO(409, ex.getMessage());
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(responseData);
