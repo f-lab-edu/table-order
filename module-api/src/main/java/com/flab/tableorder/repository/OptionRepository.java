@@ -1,5 +1,6 @@
-package com.flab.tableorder.document;
+package com.flab.tableorder.repository;
 
+import com.flab.tableorder.document.Option;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;

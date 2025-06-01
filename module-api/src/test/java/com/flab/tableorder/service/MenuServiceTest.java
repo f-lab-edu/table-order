@@ -2,13 +2,13 @@ package com.flab.tableorder.service;
 
 import com.flab.tableorder.DataLoader;
 import com.flab.tableorder.document.Call;
-import com.flab.tableorder.document.CallRepository;
+import com.flab.tableorder.repository.CallRepository;
 import com.flab.tableorder.document.Category;
-import com.flab.tableorder.document.CategoryRepository;
+import com.flab.tableorder.repository.CategoryRepository;
 import com.flab.tableorder.document.Menu;
-import com.flab.tableorder.document.MenuRepository;
+import com.flab.tableorder.repository.MenuRepository;
 import com.flab.tableorder.document.Option;
-import com.flab.tableorder.document.OptionRepository;
+import com.flab.tableorder.repository.OptionRepository;
 import com.flab.tableorder.document.Store;
 import com.flab.tableorder.dto.CallDTO;
 import com.flab.tableorder.dto.MenuCategoryDTO;

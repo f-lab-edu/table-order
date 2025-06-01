@@ -1,13 +1,13 @@
 package com.flab.tableorder.service;
 
 import com.flab.tableorder.document.Call;
-import com.flab.tableorder.document.CallRepository;
+import com.flab.tableorder.repository.CallRepository;
 import com.flab.tableorder.document.Menu;
-import com.flab.tableorder.document.MenuRepository;
+import com.flab.tableorder.repository.MenuRepository;
 import com.flab.tableorder.document.Option;
-import com.flab.tableorder.document.OptionRepository;
+import com.flab.tableorder.repository.OptionRepository;
 import com.flab.tableorder.document.Stat;
-import com.flab.tableorder.document.StatRepository;
+import com.flab.tableorder.repository.StatRepository;
 import com.flab.tableorder.dto.OrderDTO;
 import com.flab.tableorder.exception.MenuNotFoundException;
 import com.flab.tableorder.exception.PriceNotMatchedException;

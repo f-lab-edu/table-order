@@ -1,7 +1,7 @@
 package com.flab.tableorder.service;
 
 import com.flab.tableorder.document.Store;
-import com.flab.tableorder.document.StoreRepository;
+import com.flab.tableorder.repository.StoreRepository;
 import com.flab.tableorder.exception.StoreNotFoundException;
 
 import java.util.Optional;

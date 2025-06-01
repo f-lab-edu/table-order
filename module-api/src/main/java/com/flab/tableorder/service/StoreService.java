@@ -1,11 +1,11 @@
 package com.flab.tableorder.service;
 
-import com.flab.tableorder.document.CallRepository;
-import com.flab.tableorder.document.CategoryRepository;
-import com.flab.tableorder.document.MenuRepository;
-import com.flab.tableorder.document.OptionRepository;
+import com.flab.tableorder.repository.CallRepository;
+import com.flab.tableorder.repository.CategoryRepository;
+import com.flab.tableorder.repository.MenuRepository;
+import com.flab.tableorder.repository.OptionRepository;
 import com.flab.tableorder.document.Store;
-import com.flab.tableorder.document.StoreRepository;
+import com.flab.tableorder.repository.StoreRepository;
 import com.flab.tableorder.exception.StoreNotFoundException;
 
 import lombok.RequiredArgsConstructor;

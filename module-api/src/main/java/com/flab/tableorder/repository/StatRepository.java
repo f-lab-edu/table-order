@@ -1,7 +1,8 @@
-package com.flab.tableorder.document;
+package com.flab.tableorder.repository;
 
 import java.util.List;
 
+import com.flab.tableorder.document.Stat;
 import lombok.RequiredArgsConstructor;
 
 import org.bson.types.ObjectId;
