@@ -5,6 +5,7 @@ import com.flab.tableorder.dto.OrderDTO;
 import com.flab.tableorder.dto.ResponseDTO;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import com.flab.tableorder.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -25,12 +26,15 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/table/{tableNum}")
-    public ResponseEntity<ResponseDTO<List<OrderDTO>>> postOrder(@RequestBody List<OrderDTO> requestData, @PathVariable int tableNum) {
-        List<OrderDTO> orderListAll = orderService.orderMenu(requestData, StoreContext.getStoreId(), tableNum);
+    public CompletableFuture<ResponseEntity<ResponseDTO<List<OrderDTO>>>> postOrder(@RequestBody List<OrderDTO> requestData, @PathVariable int tableNum) {
+        String storeId = StoreContext.getStoreId();
+        return CompletableFuture.supplyAsync(() -> {
+            List<OrderDTO> orderListAll = orderService.orderMenu(requestData, storeId, tableNum);
 
-        ResponseDTO<List<OrderDTO>> responseData = new ResponseDTO<>(200, "", orderListAll);
+            ResponseDTO<List<OrderDTO>> responseData = new ResponseDTO<>(200, "", orderListAll);
 
-        return ResponseEntity.ok(responseData);
+            return ResponseEntity.ok(responseData);
+        });
     }
 
     @DeleteMapping("/table/{tableNum}")

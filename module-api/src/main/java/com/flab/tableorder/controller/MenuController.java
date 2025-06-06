@@ -8,6 +8,7 @@ import com.flab.tableorder.dto.ResponseDTO;
 import com.flab.tableorder.service.MenuService;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,21 +25,27 @@ public class MenuController {
     private final MenuService menuService;
 
     @GetMapping
-    public ResponseEntity<ResponseDTO<List<MenuCategoryDTO>>> getAllMenu() {
-        List<MenuCategoryDTO> menuList = menuService.getAllMenu(StoreContext.getStoreId());
+    public CompletableFuture<ResponseEntity<ResponseDTO<List<MenuCategoryDTO>>>> getAllMenu() {
+        String storeId = StoreContext.getStoreId();
+        return CompletableFuture.supplyAsync(() -> {
+            List<MenuCategoryDTO> menuList = menuService.getAllMenu(storeId);
 
-        ResponseDTO<List<MenuCategoryDTO>> responseData = new ResponseDTO<>(200, "", menuList);
+            ResponseDTO<List<MenuCategoryDTO>> responseData = new ResponseDTO<>(200, "", menuList);
 
-        return ResponseEntity.ok(responseData);
+            return ResponseEntity.ok(responseData);
+        });
     }
 
     @GetMapping("/{menuId}")
-    public ResponseEntity<ResponseDTO<MenuDTO>> getMenuByMenuId(@PathVariable String menuId) {
-        MenuDTO menu = menuService.getMenu(StoreContext.getStoreId(), menuId);
+    public CompletableFuture<ResponseEntity<ResponseDTO<MenuDTO>>> getMenuByMenuId(@PathVariable String menuId) {
+        String storeId = StoreContext.getStoreId();
+        return CompletableFuture.supplyAsync(() -> {
+            MenuDTO menu = menuService.getMenu(storeId, menuId);
 
-        ResponseDTO<MenuDTO> responseData = new ResponseDTO<>(200, "", menu);
+            ResponseDTO<MenuDTO> responseData = new ResponseDTO<>(200, "", menu);
 
-        return ResponseEntity.ok(responseData);
+            return ResponseEntity.ok(responseData);
+        });
     }
 
     @GetMapping("/call")
