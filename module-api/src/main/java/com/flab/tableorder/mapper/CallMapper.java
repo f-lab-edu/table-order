@@ -1,9 +1,7 @@
 package com.flab.tableorder.mapper;
 
-import com.flab.tableorder.domain.Call;
-import com.flab.tableorder.domain.Menu;
+import com.flab.tableorder.document.Call;
 import com.flab.tableorder.dto.CallDTO;
-import com.flab.tableorder.dto.MenuDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;

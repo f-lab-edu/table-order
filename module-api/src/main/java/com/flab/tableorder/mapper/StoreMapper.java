@@ -1,6 +1,6 @@
 package com.flab.tableorder.mapper;
 
-import com.flab.tableorder.domain.Store;
+import com.flab.tableorder.document.Store;
 import com.flab.tableorder.dto.StoreDTO;
 
 import org.mapstruct.Mapping;

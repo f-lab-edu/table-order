@@ -1,14 +1,11 @@
 package com.flab.tableorder.interceptor;
 
 import com.flab.tableorder.DataLoader;
-import com.flab.tableorder.domain.Store;
-import com.flab.tableorder.domain.StoreRepository;
+import com.flab.tableorder.document.Store;
 
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
-
-import org.bson.types.ObjectId;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -19,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -36,7 +34,7 @@ public class ApiKeyInterceptorTest {
     @Autowired
     private TestRestTemplate restTemplate;
     @Autowired
-    private StoreRepository storeRepository;
+    private RedisTemplate<String, Object> redisTemplate;
 
     private String url;
     private String storeId = "";
@@ -55,7 +53,7 @@ public class ApiKeyInterceptorTest {
     void APIKey_NoAuthorization() {
         Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, null);
         assertThat(responseData.get("code")).isEqualTo(HttpStatus.UNAUTHORIZED.value());
-        assertThat(responseData.get("message")).isEqualTo("Invalid API Key");
+        assertThat(responseData.get("message")).isEqualTo("요청에 사용된 API 키가 올바르지 않습니다. 관리자에게 문의해 주세요.");
     }
 
     @Test
@@ -67,11 +65,14 @@ public class ApiKeyInterceptorTest {
 
         Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, httpEntity);
         assertThat(responseData.get("code")).isEqualTo(HttpStatus.NOT_FOUND.value());
-        assertThat(responseData.get("message").toString().startsWith("Store not found for API key:")).isTrue();
+        assertThat(responseData.get("message").toString()).isEqualTo("요청하신 API 키로 등록된 매장을 찾을 수 없습니다.");
     }
 
     @Test
     void APIKeyCache_Success() {
+        String key = "apiKey::" + this.apiKey;
+        redisTemplate.delete(key);
+
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + this.apiKey);
 
@@ -80,7 +81,6 @@ public class ApiKeyInterceptorTest {
         Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, httpEntity);
         assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
 
-        responseData = DataLoader.getResponseData(restTemplate, this.url, HttpMethod.GET, httpEntity);
-        assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
+        assertThat(redisTemplate.opsForValue().get(key)).isEqualTo(this.storeId);
     }
 }
