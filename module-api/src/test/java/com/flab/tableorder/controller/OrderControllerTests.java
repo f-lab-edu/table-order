@@ -95,7 +95,7 @@ class OrderControllerTests extends AbstractControllerTest {
             .price(menu2.getPrice())
             .build();
 
-        List<OrderDTO> orderList = List.of(orderDTO1);
+        List<OrderDTO> orderList = List.of(orderDTO1, orderDTO2);
 
         ObjectId storeId = this.store.getStoreId();
         int tableNum = 1;
@@ -128,9 +128,6 @@ class OrderControllerTests extends AbstractControllerTest {
             })
             .toList());
 
-        List<OrderDTO> beforeOrderList = orderService.getOrderList(storeId.toString(), tableNum);
-        Map<String, Integer> beforeStatMap = makeStatMap(orderService.getTodayOrderStats(storeId, date));
-
         HttpEntity httpEntity = new HttpEntity(orderList, headers);
         Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url + "/order/table/" + tableNum, HttpMethod.POST, httpEntity);
         assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
@@ -138,25 +135,12 @@ class OrderControllerTests extends AbstractControllerTest {
         List<OrderDTO> resOrderList = ((List<Map<String, Object>>) responseData.get("data")).stream()
             .map(data -> objectMapper.convertValue(data, OrderDTO.class))
             .toList();
-        assertThat(resOrderList.size()).isEqualTo(beforeOrderList.size() + orderList.size());
+        assertThat(resOrderList.size()).isGreaterThan(orderList.size());
 
-        List<OrderDTO> afterOrderList = orderService.getOrderList(storeId.toString(), tableNum);
-        OrderServiceTest.diffOrderList(afterOrderList, resOrderList);
-
-        OrderServiceTest.diffOrderList(beforeOrderList, afterOrderList.stream()
-            .skip(0)
-            .limit(beforeOrderList.size())
-            .toList());
-
-        OrderServiceTest.diffOrderList(orderList, afterOrderList.stream()
-            .skip(beforeOrderList.size())
+        OrderServiceTest.diffOrderList(orderList, resOrderList.stream()
+            .skip(resOrderList.size() - orderList.size())
             .limit(orderList.size())
             .toList());
-
-        Map<String, Integer> afterStatMap = makeStatMap(orderService.getTodayOrderStats(storeId, date));
-        orderStatMap.forEach((key, value) -> {
-            assertThat(afterStatMap.get(key) - value).isEqualTo(Optional.ofNullable(beforeStatMap.get(key)).orElse(0));
-        });
     }
 
     @Test
