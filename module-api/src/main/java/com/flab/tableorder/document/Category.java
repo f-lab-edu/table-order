@@ -1,6 +1,4 @@
-package com.flab.tableorder.domain;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+package com.flab.tableorder.document;
 
 import jakarta.persistence.Id;
 import lombok.Getter;
