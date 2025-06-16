@@ -2,8 +2,6 @@ package com.flab.tableorder.exception;
 
 import com.flab.tableorder.dto.ResponseDTO;
 
-import jakarta.persistence.EntityNotFoundException;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +19,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
-    @ExceptionHandler({EntityNotFoundException.class, StoreNotFoundException.class, MenuNotFoundException.class})
+    @ExceptionHandler({StoreNotFoundException.class, MenuNotFoundException.class})
     public ResponseEntity<ResponseDTO> handleEntityNotFound(RuntimeException ex) {
         log.error(ex.getMessage());
         ResponseDTO responseData = new ResponseDTO(404, ex.getMessage());
