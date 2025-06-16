@@ -10,3 +10,15 @@ repositories {
     // https://repo.maven.apache.org/maven2/ 에서 라이브러리를 다운 받음.
     mavenCentral()
 }
+
+// jdk version 설정
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+dependencies {
+    // Spring Boot BOM 으로 의존성 관리 => 하위 모듈에서도 아래 설정 그대로 적용 시킴.s
+    implementation platform('org.springframework.boot:spring-boot-dependencies:3.4.4')
+}
