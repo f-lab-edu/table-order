@@ -2,10 +2,10 @@ package com.flab.tableorder.document;
 
 import java.util.List;
 
-import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 @Getter @Setter
