@@ -1,14 +1,12 @@
 package com.flab.tableorder.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.tableorder.DataLoader;
-import com.flab.tableorder.domain.CallRepository;
-import com.flab.tableorder.domain.CategoryRepository;
-import com.flab.tableorder.domain.MenuRepository;
-import com.flab.tableorder.domain.Menu;
-import com.flab.tableorder.domain.OptionRepository;
-import com.flab.tableorder.domain.Store;
-import com.flab.tableorder.domain.StoreRepository;
+import com.flab.tableorder.repository.CallRepository;
+import com.flab.tableorder.repository.CategoryRepository;
+import com.flab.tableorder.repository.MenuRepository;
+import com.flab.tableorder.document.Menu;
+import com.flab.tableorder.repository.OptionRepository;
+import com.flab.tableorder.repository.StoreRepository;
 import com.flab.tableorder.dto.MenuCategoryDTO;
 import com.flab.tableorder.dto.MenuDTO;
 
@@ -16,7 +14,6 @@ import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 
-import com.flab.tableorder.dto.StoreDTO;
 import com.flab.tableorder.service.StoreService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,7 +41,7 @@ class MenuControllerTests extends AbstractControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private RedisTemplate<String, List<Map<String, Object>>> redisTemplate;
 
     @Value("${db.data.init}")
     private String isInit;
@@ -121,12 +118,16 @@ class MenuControllerTests extends AbstractControllerTest {
         }
     }
     @Test
-    void getAllMenu_Success() {
+    void getAllMenuAndRedis_Success() {
+        String key = "store::" + this.store.getStoreId().toString();
+        redisTemplate.delete(key);
+
         Map<String, Object> responseData = DataLoader.getResponseData(restTemplate, this.url + "/menu", HttpMethod.GET, this.httpEntity);
 
         assertThat(responseData.get("code")).isEqualTo(HttpStatus.OK.value());
 
         diffAllMenu((List<Map<String, Object>>) responseData.get("data"));
+        diffAllMenu(redisTemplate.opsForValue().get(key));
     }
 
      @Test
@@ -157,17 +158,5 @@ class MenuControllerTests extends AbstractControllerTest {
              assertThat(resCallList.get(i).get("callName")).isEqualTo(this.callList.get(i).getCallName());
          }
      }
-
-    @Test
-    void getAllMenu_Redis() {
-        Store mockStore = DataLoader.getDataInfo("store", "pizza.json", Store.class);
-        String storeId = mockStore.getStoreId().toString();
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        diffAllMenu(((StoreDTO) redisTemplate.opsForValue().get("store:" + storeId)).getCategories()
-            .stream()
-            .map(category -> (Map<String, Object>) objectMapper.convertValue(category, Map.class))
-            .toList());
-    }
 
 }

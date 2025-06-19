@@ -1,15 +1,15 @@
 package com.flab.tableorder.service;
 
 import com.flab.tableorder.DataLoader;
-import com.flab.tableorder.domain.Call;
-import com.flab.tableorder.domain.CallRepository;
-import com.flab.tableorder.domain.Category;
-import com.flab.tableorder.domain.CategoryRepository;
-import com.flab.tableorder.domain.Menu;
-import com.flab.tableorder.domain.MenuRepository;
-import com.flab.tableorder.domain.Option;
-import com.flab.tableorder.domain.OptionRepository;
-import com.flab.tableorder.domain.Store;
+import com.flab.tableorder.document.Call;
+import com.flab.tableorder.repository.CallRepository;
+import com.flab.tableorder.document.Category;
+import com.flab.tableorder.repository.CategoryRepository;
+import com.flab.tableorder.document.Menu;
+import com.flab.tableorder.repository.MenuRepository;
+import com.flab.tableorder.document.Option;
+import com.flab.tableorder.repository.OptionRepository;
+import com.flab.tableorder.document.Store;
 import com.flab.tableorder.dto.CallDTO;
 import com.flab.tableorder.dto.MenuCategoryDTO;
 
@@ -27,8 +27,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.redis.core.ListOperations;
-import org.springframework.data.redis.core.RedisTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -36,10 +34,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class MenuServiceTest {
-    @Mock
-    private RedisTemplate<String, MenuCategoryDTO> redisTemplate;
-    @Mock
-    private ListOperations<String, MenuCategoryDTO> listOperations;
     @Mock
     private MenuRepository menuRepository;
     @Mock
@@ -58,7 +52,6 @@ public class MenuServiceTest {
         ObjectId objectId = mockStore.getStoreId();
         String storeId = objectId.toString();
 
-        when(redisTemplate.opsForList()).thenReturn(listOperations);
         when(categoryRepository.findAllByStoreIdAndOptionFalse(objectId)).thenReturn(List.of());
 
         List<MenuCategoryDTO> allMenu = menuService.getAllMenu(storeId);
@@ -81,7 +74,6 @@ public class MenuServiceTest {
             .map(category -> category.getCategoryId())
             .toList();
 
-        when(redisTemplate.opsForList()).thenReturn(listOperations);
         when(categoryRepository.findAllByStoreIdAndOptionFalse(objectId)).thenReturn(categoryList);
         when(menuRepository.findAllByCategoryIdIn(categoryIds)).thenReturn(List.of());
 
@@ -96,7 +88,7 @@ public class MenuServiceTest {
     }
 
     @Test
-    void getAllMenu_NotEmpty() {
+    void getAllMenu_Success() {
         String fileName = "pizza.json";
 
         Store mockStore = DataLoader.getDataInfo("store", fileName, Store.class);
@@ -113,7 +105,6 @@ public class MenuServiceTest {
 
         List<Menu> menuList = DataLoader.getDataList("menu", fileName, Menu.class);
 
-        when(redisTemplate.opsForList()).thenReturn(listOperations);
         when(categoryRepository.findAllByStoreIdAndOptionFalse(objectId)).thenReturn(categoryList);
         when(menuRepository.findAllByCategoryIdIn(categoryIds)).thenReturn(menuList);
 
@@ -137,7 +128,7 @@ public class MenuServiceTest {
 
         assertThatThrownBy(() -> menuService.getMenu("invalidStoreId", menuId.toString()))
             .isInstanceOf(MenuNotFoundException.class)
-            .hasMessageStartingWith("Menu not found for menuId:");
+            .hasMessage("메뉴를 찾을 수 없습니다.");
     }
 
     @Test
@@ -151,8 +142,7 @@ public class MenuServiceTest {
 
         assertThatThrownBy(() -> menuService.getMenu("invalidStoreId", menuId.toString()))
             .isInstanceOf(StoreNotFoundException.class)
-            .hasMessageStartingWith("Store not found for categoryId:")
-        ;
+            .hasMessage("해당 카테고리에 해당하는 매장을 찾을 수 없습니다.");
     }
 
     @Test
@@ -169,8 +159,7 @@ public class MenuServiceTest {
 
         assertThatThrownBy(() -> menuService.getMenu("222222222222222222222222", menuId.toString()))
             .isInstanceOf(StoreNotFoundException.class)
-            .hasMessageStartingWith("Store mismatch:")
-        ;
+            .hasMessage("해당 매장을 찾을 수 없습니다.");
     }
 
     @Test
@@ -195,7 +184,7 @@ public class MenuServiceTest {
 
         List<Category> categoryList = DataLoader.getDataList("category", fileName, Category.class)
             .stream()
-            .filter(category ->  category.isOption())
+            .filter(category -> category.isOption())
             .toList();
         List<Option> optionList = DataLoader.getDataList("option", fileName, Option.class);
 

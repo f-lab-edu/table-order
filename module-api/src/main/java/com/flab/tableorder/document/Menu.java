@@ -1,14 +1,12 @@
-package com.flab.tableorder.domain;
+package com.flab.tableorder.document;
 
 import java.util.List;
 
-import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -20,7 +18,6 @@ public class Menu {
 
     private String menuName;
     private String description;
-    private int quantity;
     private int price = 0;
     private int salePrice = 0;
     private String image;

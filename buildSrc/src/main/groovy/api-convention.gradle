@@ -1,0 +1,36 @@
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.mapstruct:mapstruct:1.5.2.Final'
+
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.2.Final'
+}
+
+test {
+    useJUnitPlatform()  // JUnit5를 사용하려면 반드시 설정이 필요
+
+    include 'com/flab/tableorder/service/**'
+
+    testLogging {
+        events "passed", "failed"
+    }
+}
+
+tasks.register('integrationTest', Test) {
+    useJUnitPlatform()
+    include 'com/flab/tableorder/controller/**'
+    include 'com/flab/tableorder/interceptor/**'
+
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+
+    shouldRunAfter tasks.test
+
+    testLogging {
+        events "passed", "failed"
+    }
+}
+
+tasks.check {
+    dependsOn tasks.named('integrationTest')
+}

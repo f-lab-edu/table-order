@@ -1,11 +1,11 @@
 package com.flab.tableorder.controller;
 
 import com.flab.tableorder.DataLoader;
-import com.flab.tableorder.domain.Call;
-import com.flab.tableorder.domain.Category;
-import com.flab.tableorder.domain.Menu;
-import com.flab.tableorder.domain.Option;
-import com.flab.tableorder.domain.Store;
+import com.flab.tableorder.document.Call;
+import com.flab.tableorder.document.Category;
+import com.flab.tableorder.document.Menu;
+import com.flab.tableorder.document.Option;
+import com.flab.tableorder.document.Store;
 import com.flab.tableorder.dto.MenuCategoryDTO;
 import com.flab.tableorder.dto.MenuDTO;
 import com.flab.tableorder.dto.StoreDTO;
@@ -15,7 +15,6 @@ import com.flab.tableorder.mapper.StoreMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 
 import java.util.HashMap;

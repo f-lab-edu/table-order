@@ -1,0 +1,12 @@
+dependencies {
+    implementation 'org.springframework.kafka:spring-kafka'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
+}
+
+test {
+    useJUnitPlatform()  // JUnit5를 사용하려면 반드시 설정이 필요
+
+    testLogging {
+        events "passed", "failed"
+    }
+}

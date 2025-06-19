@@ -1,15 +1,12 @@
 package com.flab.tableorder.service;
 
-import com.flab.tableorder.domain.CallRepository;
-import com.flab.tableorder.domain.Category;
-import com.flab.tableorder.domain.CategoryRepository;
-import com.flab.tableorder.domain.MenuRepository;
-import com.flab.tableorder.domain.OptionRepository;
-import com.flab.tableorder.domain.Store;
-import com.flab.tableorder.domain.StoreRepository;
+import com.flab.tableorder.repository.CallRepository;
+import com.flab.tableorder.repository.CategoryRepository;
+import com.flab.tableorder.repository.MenuRepository;
+import com.flab.tableorder.repository.OptionRepository;
+import com.flab.tableorder.document.Store;
+import com.flab.tableorder.repository.StoreRepository;
 import com.flab.tableorder.exception.StoreNotFoundException;
-
-import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,12 +28,12 @@ public class StoreService {
     private final CallRepository callRepository;
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "storeCache", key = "#apiKey")
+    @Cacheable(value = "apiKey", key = "#apiKey")
     public String getStoreIdByApiKey(String apiKey) {
         log.debug("캐시에 API Key가 존재하지 않음... DB Select");
 
         Store store = storeRepository.findByApiKey(apiKey)
-            .orElseThrow(() -> new StoreNotFoundException("Store not found for API key: " + apiKey));
+            .orElseThrow(() -> new StoreNotFoundException("요청하신 API 키로 등록된 매장을 찾을 수 없습니다."));
 
         return store.getStoreId().toString();
     }

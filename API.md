@@ -8,13 +8,13 @@
 
 # version
 - 2025.04.16 :
-	- API 추가
-		- PATCH /menu/table/{tableNum}/language
-		- GET /menu
-		- GET /menu/{menuId}
-		- GET /menu/call
-		- POST /order/table/{tableNum}
-		- POST /order/table/{tableNum}/call
+    - API 추가
+        - PATCH /menu/table/{tableNum}/language
+        - GET /menu
+        - GET /menu/{menuId}
+        - GET /menu/call
+        - POST /order/table/{tableNum}
+        - POST /order/table/{tableNum}/call
 - 2025.04.27 : isRequired 필드 추가
 - 2025.05.25 : GET /order/table/{tableNum} API 추가
 
@@ -251,6 +251,12 @@
         "message" : ""
     }
     ```
+- Flow
+    1. validation
+    2. 테이블의 주문 내역 업데이트 (Redis, Mongo, 테이블 초기화 시 삭제)
+    3. 당일 기준 메뉴 및 옵션 판매 수량 업데이트 (Mongo) 
+    4. 당일 매출 업데이트 (Redis, 24h)
+
 ## 주문 내역 조회
 - API : GET /order/table/{tableNum}
 - Request

@@ -1,18 +1,21 @@
 package com.flab.tableorder.service;
 
-import com.flab.tableorder.domain.*;
-import com.flab.tableorder.exception.*;
+import com.flab.tableorder.document.Store;
+import com.flab.tableorder.repository.StoreRepository;
+import com.flab.tableorder.exception.StoreNotFoundException;
 
 import java.util.Optional;
 
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.Mockito.*;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class StoreServiceTest {
@@ -28,7 +31,7 @@ public class StoreServiceTest {
 
         assertThatThrownBy(() -> storeService.getStoreIdByApiKey(apiKey))
             .isInstanceOf(StoreNotFoundException.class)
-            .hasMessageStartingWith("Store not found for API key:");
+            .hasMessage("요청하신 API 키로 등록된 매장을 찾을 수 없습니다.");
     }
 
     @Test

@@ -1,8 +1,9 @@
-package com.flab.tableorder.domain;
+package com.flab.tableorder.repository;
 
 import java.util.List;
 import java.util.Optional;
 
+import com.flab.tableorder.document.Category;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
