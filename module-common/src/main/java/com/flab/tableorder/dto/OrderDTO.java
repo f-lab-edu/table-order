@@ -1,13 +1,8 @@
 package com.flab.tableorder.dto;
 
-import java.util.List;
+import lombok.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.List;
 
 @Getter @Setter @Data @Builder
 @NoArgsConstructor @AllArgsConstructor

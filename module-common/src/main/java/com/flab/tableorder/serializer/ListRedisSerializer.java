@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +43,7 @@ public class ListRedisSerializer<T> implements RedisSerializer<List<T>> {
 
     @Override
     public List<T> deserialize(byte[] bytes) throws SerializationException {
-        if (bytes == null || bytes.length == 0) return List.of();
+        if (bytes == null || bytes.length == 0) return new ArrayList<T>();
 
         try {
             return javaType != null ? this.objectMapper.readValue(bytes, this.javaType) : this.objectMapper.readValue(bytes, this.typeReference);

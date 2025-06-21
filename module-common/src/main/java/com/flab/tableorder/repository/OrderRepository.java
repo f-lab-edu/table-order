@@ -6,8 +6,9 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface OrderRepository extends MongoRepository<Order, ObjectId> {
-    List<Order> findAllByStoreIdAndTableNum(ObjectId storeId, int tableNum);
+    List<Order> findOrdersAllByStoreIdAndTableNum(ObjectId storeId, int tableNum);
 }

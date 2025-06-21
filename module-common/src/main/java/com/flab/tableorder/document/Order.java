@@ -12,6 +12,7 @@ public class Order {
     private int tableNum;
     private ObjectId menuId;
 
+    private String status;
     private int quantity;
     private int price = 0;
 

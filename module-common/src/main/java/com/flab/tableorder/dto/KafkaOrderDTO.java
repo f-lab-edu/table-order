@@ -6,10 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter @Setter @Data 
+import java.util.List;
+
+@Getter @Setter @Data
 @NoArgsConstructor @AllArgsConstructor
-public class OrderOptionDTO {
-    private String optionId;
-    private int quantity = 0;
-    private int price;
+public class KafkaOrderDTO {
+    private List<OrderDTO> orderList;
+    private String storeId;
+    private int tableNum;
 }
