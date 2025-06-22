@@ -10,5 +10,5 @@ import java.util.Optional;
 
 @Repository
 public interface OrderRepository extends MongoRepository<Order, ObjectId> {
-    List<Order> findOrdersAllByStoreIdAndTableNum(ObjectId storeId, int tableNum);
+    List<Order> findAllByStoreIdAndTableNum(ObjectId storeId, int tableNum);
 }
